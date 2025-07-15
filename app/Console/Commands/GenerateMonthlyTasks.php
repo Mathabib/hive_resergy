@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Console\Commands;
+
+use Illuminate\Console\Command;
+use App\Models\RecurringTask;
+use App\Models\Task;
+use Carbon\Carbon;
+
+class GenerateMonthlyTasks extends Command
+{
+    protected $signature = 'tasks:generate-monthly';
+    protected $description = 'Generate tasks from recurring templates every month';
+
+  public function handle()
+{
+    $now = Carbon::now();
+    $bulan = $now->month;
+    $tahun = $now->year;
+
+    // 1️⃣ Ambil semua recurring task aktif
+    $recurringTasks = RecurringTask::all();
+
+    // 2️⃣ Buat list pasangan [project_id, nama_task] dari recurring task
+    $validPairs = $recurringTasks->map(function ($task) {
+        return $task->project_id . '||' . $task->nama;
+    });
+
+    // 3️⃣ Hapus SEMUA task bulan ini yang:
+    // - nama_task + project_id ADA di recurring_tasks (untuk ganti ulang)
+    // - ATAU TIDAK ADA di recurring_tasks (karena task rutinan-nya sudah dihapus)
+
+    Task::whereMonth('created_at', $bulan)
+        ->whereYear('created_at', $tahun)
+        ->get()
+        ->each(function ($task) use ($validPairs) {
+            $pair = $task->project_id . '||' . $task->nama_task;
+            if ($validPairs->contains($pair) || $this->isFromRecurring($task)) {
+                $task->delete();
+            }
+        });
+
+    // 4️⃣ Generate ulang semua recurring task
+    foreach ($recurringTasks as $template) {
+        Task::create([
+            'project_id' => $template->project_id,
+            'nama_task' => $template->nama,
+            'description' => $template->deskripsi ?? '...',
+            'status' => 'todo',
+            'priority' => 'medium',
+            'progress' => 0,
+            'comment' => 'Task otomatis dari task rutinan.',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    $this->info("✅ Task rutinan bulan ini berhasil dihapus & digenerate ulang.");
+}
+
+// Tambahkan fungsi bantu (opsional, kalau kamu mau tandai task rutinan)
+private function isFromRecurring(Task $task): bool
+{
+    return str_contains($task->comment, 'Task otomatis dari task rutinan');
+}
+
+}
