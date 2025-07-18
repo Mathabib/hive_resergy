@@ -9,7 +9,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\ThemeController;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Artisan; 
+use App\Http\Controllers\Auth\PasswordResetLinkController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -80,6 +81,12 @@ Route::middleware('auth')->group(function () {
 
    Route::get('/theme-settings', [ThemeController::class, 'index'])->name('theme.index');
 
+Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
+Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])->name('attachments.destroy');
+
 // Simpan pengaturan tema (POST / AJAX)
 Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name('theme.update');
 
@@ -89,11 +96,15 @@ Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name(
 })->name('admin.task-rutinan.generate-now');
     
 
-Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
-Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
-Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])->name('attachments.destroy');
+
+
+// Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
+//     ->middleware('guest')
+//     ->name('password.request');
+
+// Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
+//     ->middleware('guest')
+//     ->name('password.email');
 
 
 // web.php

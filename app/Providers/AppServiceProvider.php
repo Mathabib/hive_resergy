@@ -52,10 +52,10 @@ public function boot(): void
             $view->with('projects_sidebar', $projects);
 
             // ✅ Kirim user yang login
-            $view->with('user', Auth::user());
+            $view->with('authuser', Auth::user());
         } else {
             $view->with('projects_sidebar', collect()); // kosong kalau belum login
-            $view->with('user', null); // user null kalau belum login
+            $view->with('authuser', null); // user null kalau belum login
         }
 
         // ✅ Kirim theme setting ke semua view

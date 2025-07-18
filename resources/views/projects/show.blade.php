@@ -19,7 +19,7 @@
   }
 
   .kanban-column {
-    background-color: #343a40;
+    background-color: #fffafaff;
     border-radius: 12px;
     padding: 20px;
     width: 420px;
@@ -167,7 +167,7 @@
   @include('komponen.navbar_mode')
 </div>
 <div style="padding: 20px 20px 0 20px;" id="project-title" data-projectid="{{ $project->id }}">
-  <h1 style="font-size: 1.75rem; font-weight: 700; color:rgb(255, 255, 255);">
+  <h1 style="font-size: 1.75rem; font-weight: 700; color: #db4747ff;">
     {{ $project->nama ?? 'Unnamed Project' }}
   </h1>
 </div>

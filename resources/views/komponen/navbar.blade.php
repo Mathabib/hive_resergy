@@ -32,7 +32,7 @@
             <li class="nav-item dropdown user-menu">
               <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
                 <img
-                 src="{{ $user && $user->profile_photo ? asset('storage/profile_photos/' . $user->profile_photo) : asset('assets/img/default-avatar.png') }}"
+                 src="{{ $authuser && $authuser->profile_photo ? asset('storage/profile_photos/' . $authuser->profile_photo) : asset('assets/img/default-avatar.png') }}"
                   class="user-image rounded-circle shadow"
                   alt="User Image"
                 />
@@ -42,7 +42,7 @@
                 <!--begin::User Image-->
                 <li class="user-header text-bg-danger">
                   <img
-                     src="{{ $user && $user->profile_photo ? asset('storage/profile_photos/' . $user->profile_photo) : asset('assets/img/default-avatar.png') }}"
+                     src="{{ $authuser && $authuser->profile_photo ? asset('storage/profile_photos/' . $authuser->profile_photo) : asset('assets/img/default-avatar.png') }}"
                     class="rounded-circle shadow"
                     alt="User Image"
                   />

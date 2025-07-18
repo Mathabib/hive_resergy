@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Notifications\ResetPassword;
 
 class User extends Authenticatable
 {
@@ -49,6 +50,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class);
     }
+
+    public function sendPasswordResetNotification($token)
+{
+    logger("Kirim email reset ke: " . $this->email);
+    logger("Token: " . $token);
+
+    $this->notify(new ResetPassword($token));
+}
 
 
 }

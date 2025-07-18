@@ -14,13 +14,18 @@
   outline: none;
   }
 </style>
+<!-- Font Awesome (versi 6) -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
 <div style="display:flex; gap:20px;">
 
   <!-- Form Edit Task -->
   <div style="flex:2;  padding:20px; border-radius:12px;">
     <div class="d-flex justify-content-between">
       <div class="">
-        <a href="{{ url()->previous() }}" style="text-decoration: none;color: white"><h2><i class="fa-solid fa-arrow-left"></i></h2></a>
+         <a href="{{ url()->previous() }}" style="text-decoration: none; color: #6b6666ff;">
+        <h2><i class="fa-solid fa-arrow-left"></i></h2>
+      </a>
       </div>
       <div class="dropdown">        
         <span class="float-end fs-5 fw-bold" style="cursor: pointer"  data-bs-toggle="dropdown" aria-expanded="false"><h1>...</h1></span>

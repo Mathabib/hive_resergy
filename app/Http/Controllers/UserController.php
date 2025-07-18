@@ -10,11 +10,12 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     // Tampilkan daftar user
-    public function index()
-    {
-        $users = User::with('projects')->get();
-        return view('users.index', compact('users'));
-    }
+  public function index()
+{
+    $users = User::with('projects')->paginate(10);
+    return view('users.index', compact('users'));
+}
+
 
     // Form tambah user
     public function create()
@@ -42,20 +43,36 @@ class UserController extends Controller
         ]);
 
         // Assign project jika dipilih
-        if ($request->filled('project_ids')) {
-            $user->projects()->attach($request->project_ids);
-        }
+        if ($request['role'] === 'admin') {
+        // Admin: assign semua project
+        $allProjects = Project::pluck('id')->toArray();
+        $user->projects()->sync($allProjects);
+    } else {
+        $user->projects()->sync($request['project_ids'] ?? []);
+    }
 
-        return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan!');
+        return redirect()->route('users.index')->with('success', 'User added successfully!');
     }
 
     // Form edit user
-    public function edit(User $user)
-    {
-        $projects = Project::all();
-        $projects_access = $user->projects;
-        return view('users.edit', compact('user', 'projects', 'projects_access'));
-    }
+    // public function edit(User $user)
+    // {
+    //     $projects = Project::all();
+    //     $projects_access = $user->projects;
+    //     return view('users.edit', compact('user', 'projects', 'projects_access'));
+    // }
+
+
+public function edit($id)
+{
+    $user = User::with('projects')->findOrFail($id); // Ambil user sesuai ID di URL
+    $projects = Project::all();
+    $selectedProjects = $user->projects->pluck('id')->toArray();
+
+    return view('users.edit', compact('user', 'projects', 'selectedProjects'));
+}
+
+
 
     // Beri akses ke proyek tertentu
     public function give_access(Request $request)
@@ -87,31 +104,39 @@ class UserController extends Controller
 
 
 
+
+
 public function update(Request $request, User $user)
 {
+    // Validasi input
     $request->validate([
-        'name'        => 'required|string|max:255',
-        'email'       => 'required|email|unique:users,email,' . $user->id,
-        'password'    => 'nullable|string|min:8|confirmed',
-        'role'        => 'nullable|string',
-        'project_ids' => 'nullable|array',
+        'name'            => 'required|string|max:255',
+        'email'           => 'required|email|unique:users,email,' . $user->id,
+        'password'        => 'nullable|string|min:8|confirmed',
+        'role'            => 'required|string|in:user,admin',
+        'project_ids'     => 'nullable|array',
+        'project_ids.*'   => 'exists:projects,id',
     ]);
 
+    // Update field dasar
     $user->name  = $request->name;
     $user->email = $request->email;
-    $user->role  = $request->role ?? 'user';
+    $user->role  = $request->role;
 
+    // Hanya update password jika diisi
     if ($request->filled('password')) {
         $user->password = Hash::make($request->password);
     }
 
+    // Simpan perubahan user
     $user->save();
 
-    // Simpan akses proyek (many-to-many sync)
+    // Sync relasi project jika ada
     $user->projects()->sync($request->project_ids ?? []);
 
     return redirect()->route('users.index')->with('success', 'User has been successfully updated!');
 }
+
 
     // Hapus user
     public function destroy(User $user)

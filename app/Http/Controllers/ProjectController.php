@@ -65,7 +65,7 @@ public function create()
         ]);
 
         return redirect()->route('projects.index2') // sesuaikan dengan route index-mu
-                         ->with('success', 'Project berhasil ditambahkan!');
+                         ->with('success', 'Project added successfully!');
     }
 
 
@@ -90,7 +90,7 @@ public function create()
         ]);
 
         return redirect()->route('projects.index2') // sesuaikan dengan route index-mu
-                         ->with('success', 'Project berhasil diperbarui!');
+                         ->with('success', 'Profile updated successfully!');
     }
 
     // Hapus project (kalau perlu)
@@ -99,7 +99,7 @@ public function create()
         $project->delete();
 
         return redirect()->route('projects.index2')
-                         ->with('success', 'Project berhasil dihapus!');
+                         ->with('success', 'Project deleted successfully!');
     }
 
     public function gantt(Project $project)

@@ -6,7 +6,7 @@
       <!--begin::Sidebar Brand-->
         <div class="sidebar-brand">
           <!--begin::Brand Link-->
-          <a href="./index.html" class="brand-link">
+          <a href="{{ route('dashboard') }}" class="brand-link">
             <!--begin::Brand Image-->
              <!--begin::Left Logo-->
                <img

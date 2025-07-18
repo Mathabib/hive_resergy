@@ -9,13 +9,13 @@
     }
 </style>
 <div class="container py-4">
-    <div class="card shadow-sm border-0 bg-dark text-warning" id="gantt_data" data-urlupdate="{{ route('gantt.update') }}" data-csrftoken="{{ csrf_token() }}">
+    <div class="card shadow-sm border-0 bg-white text-danger" id="gantt_data" data-urlupdate="{{ route('gantt.update') }}" data-csrftoken="{{ csrf_token() }}">
         <div class="card-body">
-            <h3 class="mb-4">📊 Gantt Chart untuk Proyek: <strong>{{ $project->nama }}</strong></h3>
+            <h3 class="mb-4">📊 Project Gantt Chart: <strong>{{ $project->nama }}</strong></h3>
 
             {{-- <pre class="bg-light p-3 rounded text-dark">{{ json_encode($ganttTasks, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre> --}}
 
-            <div id="gantt" style="border: 2px dashed #ffc107; border-radius: 10px; background-color: #ffffff;"></div>
+            <div id="gantt" style="border: 2px dashed #df8383ff; border-radius: 10px; background-color: #ffffff;"></div>
         </div>
     </div>
 </div>
@@ -49,7 +49,7 @@
                 custom_popup_html: null
             });
         } else {
-            document.getElementById("gantt").innerHTML = "<p class='text-muted'>Tidak ada data tugas.</p>";
+            document.getElementById("gantt").innerHTML = "<p class='text-muted'>No task data.</p>";
         }
 
         
@@ -77,7 +77,7 @@
                 },
                 error: function(err) {
                     console.error("Error updating task:", err);
-                    alert("Gagal menyimpan perubahan.");
+                    alert("Failed to save changes.");
                 }
             })
         }
