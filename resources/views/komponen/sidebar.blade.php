@@ -54,23 +54,26 @@
                       @endforeach
                     </ul> -->
 
- <ul class="nav nav-treeview">
+<ul class="nav nav-treeview">
   @foreach($projects_sidebar as $project)
     @if(is_null($project->parent_id))
       <li class="nav-item has-treeview">
         @if($project->children && $project->children->count())
-          <!-- Jika ada anak: buat tombol toggle -->
-          <a href="#" class="nav-link project-toggle">
-            <i class="nav-icon bi bi-folder"></i>
-            <p>
-              {{ $project->nama }}
-              <i class="right fas fa-angle-left"></i>
-            </p>
-          </a>
+          <!-- Bagi jadi dua: satu untuk link, satu untuk toggle -->
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ route('projects.show', $project->id) }}"
+               class="nav-link flex-grow-1 {{ request()->is('projects/'.$project->id) ? 'active' : '' }}">
+              <i class="nav-icon bi bi-folder"></i>
+              <p class="mb-0">{{ $project->nama }}</p>
+            </a>
+            <button class="btn btn-sm btn-toggle-subfolder" style="background:none; border:none;">
+              <i class="fas fa-angle-left"></i>
+            </button>
+          </div>
 
-          <ul class="nav nav-treeview subproject-list" style="display: none;">
+          <ul class="nav nav-treeview subproject-list ms-3" style="display: none;">
             @foreach($project->children as $child)
-              <li class="nav-item ms-3">
+              <li class="nav-item">
                 <a href="{{ route('projects.show', $child->id) }}"
                    class="nav-link {{ request()->is('projects/'.$child->id) ? 'active' : '' }}">
                   <i class="bi bi-circle nav-icon"></i>
@@ -80,7 +83,7 @@
             @endforeach
           </ul>
         @else
-          <!-- Jika tidak ada anak: langsung link -->
+          <!-- Kalau tidak punya anak, langsung jadi link biasa -->
           <a href="{{ route('projects.show', $project->id) }}"
              class="nav-link {{ request()->is('projects/'.$project->id) ? 'active' : '' }}">
             <i class="nav-icon bi bi-folder"></i>
@@ -150,22 +153,23 @@
 
       @push('js')
 
-      <script>
+<script>
   document.addEventListener('DOMContentLoaded', function () {
-    const toggles = document.querySelectorAll('.project-toggle');
+    const toggleButtons = document.querySelectorAll('.btn-toggle-subfolder');
 
-    toggles.forEach(toggle => {
-      toggle.addEventListener('click', function (e) {
-        e.preventDefault(); // Hindari reload
-        const nextUl = this.nextElementSibling;
-        const icon = this.querySelector('.right');
+    toggleButtons.forEach(button => {
+      button.addEventListener('click', function (e) {
+        e.preventDefault(); // jangan biarkan button nge-reload
+        const parent = this.closest('li');
+        const sublist = parent.querySelector('.subproject-list');
+        const icon = this.querySelector('i');
 
-        if (nextUl.style.display === 'none' || nextUl.style.display === '') {
-          nextUl.style.display = 'block';
+        if (sublist.style.display === 'none' || sublist.style.display === '') {
+          sublist.style.display = 'block';
           icon.classList.remove('fa-angle-left');
           icon.classList.add('fa-angle-down');
         } else {
-          nextUl.style.display = 'none';
+          sublist.style.display = 'none';
           icon.classList.remove('fa-angle-down');
           icon.classList.add('fa-angle-left');
         }

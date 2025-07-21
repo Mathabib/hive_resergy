@@ -34,9 +34,10 @@ public function show(Project $project)
 
 public function list(Project $project)
 {
-    $tasks = $project->tasks()->get();
+    $tasks = $project->tasks()->paginate(25); // 10 per halaman, bisa kamu ubah
     return view('projects.list', compact('project', 'tasks'));
 }
+
 
 public function index2()
 {

@@ -78,6 +78,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/task-rutinan', [RecurringTaskController::class, 'index'])->name('admin.task-rutinan');
     Route::post('/task-rutinan', [RecurringTaskController::class, 'store'])->name('admin.task-rutinan.store');
+    Route::get('/task-rutinan/{id}/edit', [RecurringTaskController::class, 'edit'])->name('admin.task-rutinan.s.edit');
+    Route::put('/task-rutinan/{id}', [RecurringTaskController::class, 'update'])->name('admin.task-rutinan.s.update');
     Route::delete('/task-rutinan/{id}', [RecurringTaskController::class, 'destroy'])->name('admin.task-rutinan.destroy');
 
    Route::get('/theme-settings', [ThemeController::class, 'index'])->name('theme.index');
@@ -93,7 +95,7 @@ Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name(
 
     Route::post('/task-rutinan/generate-now', function () {
     Artisan::call('tasks:generate-monthly');
-    return back()->with('success', 'Task rutinan berhasil digenerate untuk bulan ini.');
+    return back()->with('success', 'Routine tasks successfully generated for this month.');
 })->name('admin.task-rutinan.generate-now');
     
 

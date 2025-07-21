@@ -157,6 +157,40 @@
     text-decoration: underline;
     color: #dee2e6;
   }
+
+  .search-bar-container {
+  padding: 0 20px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.search-bar {
+  max-width: 400px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-bar .input-group-text {
+  background-color: #edf2f7;
+  border: none;
+  color: #4a5568;
+}
+
+.search-bar .form-control {
+  background-color: #f7fafc;
+  border: none;
+  color: #2d3748;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.search-bar .form-control:focus {
+  box-shadow: none;
+  background-color: #ffffff;
+}
+
+
 </style>
 
 
@@ -166,6 +200,18 @@
 <div>
   @include('komponen.navbar_mode')
 </div>
+
+<!-- search bar -->
+<div class="search-bar-container">
+  <div class="input-group search-bar">
+    <span class="input-group-text"><i class="bi bi-search"></i></span>
+    <input type="text" id="task-search" class="form-control" placeholder="Search tasks...">
+  </div>
+</div>
+
+
+
+
 <div style="padding: 20px 20px 0 20px;" id="project-title" data-projectid="{{ $project->id }}">
   <h1 style="font-size: 1.75rem; font-weight: 700; color: #db4747ff;">
     {{ $project->nama ?? 'Unnamed Project' }}
@@ -378,4 +424,24 @@
   updateTaskCounts();
 </script>
 
+
+<script>
+  // Task search filter
+document.getElementById('task-search').addEventListener('input', function () {
+  const searchTerm = this.value.toLowerCase();
+  const allTasks = document.querySelectorAll('.kanban-card');
+
+  allTasks.forEach(card => {
+    const taskName = card.querySelector('span')?.textContent.toLowerCase() || '';
+    if (taskName.includes(searchTerm)) {
+      card.style.display = '';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  updateTaskCounts();
+});
+
+</script>
 @endpush

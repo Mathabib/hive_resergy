@@ -23,12 +23,38 @@ class RecurringTaskController extends Controller
 
         RecurringTask::create($request->only('project_id', 'nama', 'deskripsi'));
 
-        return back()->with('success', 'Task rutinan ditambahkan.');
+        return back()->with('success', 'Routine tasks added!');
     }
 
     public function destroy($id)
     {
         RecurringTask::findOrFail($id)->delete();
-        return back()->with('success', 'Task rutinan dihapus.');
+        return back()->with('success', 'Routine tasks are removed!');
     }
+
+    public function edit($id)
+{
+    $task = RecurringTask::findOrFail($id);
+    $projects = Project::all();
+
+    return view('recurring_tasks.edit', compact('task', 'projects'));
+}
+
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'deskripsi' => 'nullable|string',
+    ]);
+
+    $task = RecurringTask::findOrFail($id);
+    $task->update([
+        'nama' => $request->nama,
+        'deskripsi' => $request->deskripsi,
+    ]);
+
+    return back()->with('success', 'Task updated successfully.');
+}
+
+
 }
