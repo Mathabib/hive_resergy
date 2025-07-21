@@ -62,17 +62,10 @@
                                                 <button type="button" class="btn btn-sm btn-outline-secondary d-none btn-cancel">
                                                     <i class="bi bi-x"></i> Cancel
                                                 </button>
-                                                <form method="POST" action="{{ route('admin.task-rutinan.destroy', $task->id) }}" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i> Delete
-                                            </button>
-                                        </form>
                                             </div>
                                         </td>
                                     </form>
-                                    <!-- <td>
+                                    <td>
                                         <form method="POST" action="{{ route('admin.task-rutinan.destroy', $task->id) }}" class="d-inline">
                                             @csrf
                                             @method('DELETE')
@@ -80,7 +73,7 @@
                                                 <i class="bi bi-trash"></i> Delete
                                             </button>
                                         </form>
-                                    </td> -->
+                                    </td>
                                 </tr>
                                 @endforeach
 
@@ -111,6 +104,7 @@
 </div>
 @endsection
 
+@push('scripts')
 @push('scripts')
 <script>
 document.addEventListener("DOMContentLoaded", () => {
