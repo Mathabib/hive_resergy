@@ -96,9 +96,30 @@
         padding: 2rem;
       }
     }
+
+    /* Preloader */
+    #preloader {
+      position: fixed;
+      z-index: 9999;
+      background-color: rgba(0, 0, 0, 0.8);
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
   <div class="overlay"></div>
 
   <div class="login-wrapper">
@@ -150,5 +171,14 @@
       </p>
     </form>
   </div>
+
+  <script>
+    window.addEventListener("load", function () {
+      const preloader = document.getElementById("preloader");
+      if (preloader) {
+        preloader.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>

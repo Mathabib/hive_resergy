@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-
 <main class="app-main">
-  <!--begin::App Content Header-->
+  <!-- App Content Header -->
   <div class="app-content-header">
     <div class="container-fluid">
       <div class="row">
@@ -17,9 +16,8 @@
       </div>
     </div>
   </div>
-  <!--end::App Content Header-->
 
-  <!--begin::App Content-->
+  <!-- App Content -->
   <div class="app-content">
     <div class="container-fluid">
       <div class="row g-4">
@@ -41,48 +39,99 @@
                       <th style="width: 50px;">No</th>
                       <th>Project Name</th>
                       <th>Description</th>
-                      <th style="width: 160px;">Action</th>
+                      <th style="width: 250px;">Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach ($projects as $index => $project)
-                      <!-- Display Row -->
-                      <tr data-id="{{ $project->id }}">
-                        <td>{{ $index + 1 }}</td>
-                        <td>{{ $project->nama }}</td>
-                        <td>{{ \Illuminate\Support\Str::limit($project->deskripsi, 100) }}</td>
+                    @php $counter = 1; @endphp
+                    @foreach ($projects->where('parent_id', null) as $parent)
+                      @php $hasSubfolders = $projects->where('parent_id', $parent->id)->count() > 0; @endphp
+                      <tr data-id="{{ $parent->id }}" class="parent-row">
+                        <td>{{ $counter++ }}</td>
                         <td>
-                          <div class="d-flex gap-2">
-                            <button class="btn btn-sm btn-warning btn-edit">
-                              <i class="bi bi-pencil-square"></i> Edit
+                          @if ($hasSubfolders)
+                            <button class="btn btn-sm btn-toggle-subfolder" data-id="{{ $parent->id }}">
+                              <i class="bi bi-caret-right-fill"></i>
                             </button>
-                            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this project?')">
-                              @csrf
-                              @method('DELETE')
-                              <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="bi bi-trash"></i> Delete
-                              </button>
+                          @endif
+                          <strong>{{ $parent->nama }}</strong>
+                        </td>
+                        <td>{{ \Illuminate\Support\Str::limit($parent->deskripsi, 100) }}</td>
+                        <td>
+                          <div class="d-flex gap-2 flex-wrap">
+                            <button class="btn btn-sm btn-warning btn-edit">  <i class="bi bi-pencil-square"></i> Edit</button>
+                            <form action="{{ route('projects.destroy', $parent->id) }}" method="POST" onsubmit="return confirm('Delete this project?')">
+                              @csrf @method('DELETE')
+                              <button type="submit" class="btn btn-sm btn-danger">  <i class="bi bi-trash"></i> Delete</button>
                             </form>
+                            <button class="btn btn-sm btn-primary btn-add-subfolder" data-id="{{ $parent->id }}">
+                             <i class="bi bi-folder-plus"></i> 
+                            </button>
                           </div>
                         </td>
                       </tr>
 
-                      <!-- Edit Row -->
-                      <tr class="edit-row d-none" data-id="{{ $project->id }}">
-                        <form action="{{ route('projects.update', $project->id) }}" method="POST">
-                          @csrf
-                          @method('PUT')
+                      {{-- Edit row for parent --}}
+                      <tr class="edit-row d-none" data-id="{{ $parent->id }}">
+                        <form action="{{ route('projects.update', $parent->id) }}" method="POST">
+                          @csrf @method('PUT')
                           <td></td>
-                          <td><input type="text" name="nama" class="form-control" value="{{ $project->nama }}" required></td>
-                          <td><input type="text" name="deskripsi" class="form-control" value="{{ $project->deskripsi }}"></td>
+                          <td><input type="text" name="nama" class="form-control" value="{{ $parent->nama }}" required></td>
+                          <td><input type="text" name="deskripsi" class="form-control" value="{{ $parent->deskripsi }}"></td>
                           <td>
                             <div class="d-flex gap-2">
-                              <button type="submit" class="btn btn-sm btn-success">
-                                <i class="bi bi-check-lg"></i> Save
-                              </button>
-                              <button type="button" class="btn btn-sm btn-secondary btn-cancel">
-                                <i class="bi bi-x-lg"></i> Cancel
-                              </button>
+                              <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Save</button>
+                              <button type="button" class="btn btn-sm btn-secondary btn-cancel-edit" data-id="{{ $parent->id }}"><i class="bi bi-x-lg"></i> Cancel</button>
+                            </div>
+                          </td>
+                        </form>
+                      </tr>
+
+                      @foreach ($projects->where('parent_id', $parent->id) as $child)
+                        <tr class="subfolder-row d-none" data-parent-id="{{ $parent->id }}" data-id="{{ $child->id }}">
+                          <td></td>
+                          <td><span class="ms-4"><i class="bi bi-arrow-return-right text-muted me-1"></i> {{ $child->nama }}</span></td>
+                          <td>{{ \Illuminate\Support\Str::limit($child->deskripsi, 100) }}</td>
+                          <td>
+                            <div class="d-flex gap-2">
+                              <button class="btn btn-sm btn-warning btn-edit">Edit</button>
+                              <form action="{{ route('projects.destroy', $child->id) }}" method="POST" onsubmit="return confirm('Delete this subfolder?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+
+                        {{-- Edit row for child --}}
+                        <tr class="edit-row d-none" data-id="{{ $child->id }}">
+                          <form action="{{ route('projects.update', $child->id) }}" method="POST">
+                            @csrf @method('PUT')
+                            <td></td>
+                            <td><input type="text" name="nama" class="form-control" value="{{ $child->nama }}" required></td>
+                            <td><input type="text" name="deskripsi" class="form-control" value="{{ $child->deskripsi }}"></td>
+                            <td>
+                              <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Save</button>
+                                <button type="button" class="btn btn-sm btn-secondary btn-cancel-edit" data-id="{{ $child->id }}"><i class="bi bi-x-lg"></i> Cancel</button>
+                              </div>
+                            </td>
+                          </form>
+                        </tr>
+                      @endforeach
+
+                      {{-- Subfolder Add Form --}}
+                      <tr class="subfolder-form-row d-none" data-parent-id="{{ $parent->id }}">
+                        <form action="{{ route('projects.store') }}" method="POST">
+                          @csrf
+                          <input type="hidden" name="parent_id" value="{{ $parent->id }}">
+                          <td></td>
+                          <td><input type="text" name="nama" class="form-control" placeholder="Subfolder name" required></td>
+                          <td><input type="text" name="deskripsi" class="form-control" placeholder="Subfolder description"></td>
+                          <td>
+                            <div class="d-flex gap-2">
+                              <button type="submit" class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Save</button>
+                              <button type="button" class="btn btn-sm btn-secondary btn-cancel-subfolder"><i class="bi bi-x-lg"></i> Cancel</button>
                             </div>
                           </td>
                         </form>
@@ -119,9 +168,10 @@
                         </td>
                       </form>
                     </tr>
+
                   </tbody>
                 </table>
-              </div> <!-- end table-responsive -->
+              </div>
             </div>
           </div>
 
@@ -129,51 +179,63 @@
       </div>
     </div>
   </div>
-  <!--end::App Content-->
 </main>
 
-<!-- Script -->
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    const btnShowAdd = document.getElementById('btn-show-add');
-    const addFormRow = document.getElementById('add-project-form-row');
-    const addBtnRow = document.getElementById('add-project-button-row');
-    const btnCancelAdd = document.getElementById('btn-cancel-add');
-
-    // Show add form
-    btnShowAdd.addEventListener('click', () => {
-      addBtnRow.classList.add('d-none');
-      addFormRow.classList.remove('d-none');
+    document.getElementById('btn-show-add')?.addEventListener('click', () => {
+      document.getElementById('add-project-button-row').classList.add('d-none');
+      document.getElementById('add-project-form-row').classList.remove('d-none');
     });
 
-    // Cancel add form
-    btnCancelAdd.addEventListener('click', () => {
-      addFormRow.classList.add('d-none');
-      addBtnRow.classList.remove('d-none');
-      addFormRow.querySelector('input[name="nama"]').value = '';
-      addFormRow.querySelector('input[name="deskripsi"]').value = '';
+    document.getElementById('btn-cancel-add')?.addEventListener('click', () => {
+      document.getElementById('add-project-form-row').classList.add('d-none');
+      document.getElementById('add-project-button-row').classList.remove('d-none');
     });
 
-    // Edit
-    document.querySelectorAll('.btn-edit').forEach(button => {
-      button.addEventListener('click', e => {
-        const row = e.target.closest('tr');
-        const id = row.dataset.id;
-        row.style.display = 'none';
-        document.querySelector(`tr.edit-row[data-id="${id}"]`).classList.remove('d-none');
+    document.querySelectorAll('.btn-toggle-subfolder').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        document.querySelectorAll(`.subfolder-row[data-parent-id="${id}"]`).forEach(row => row.classList.toggle('d-none'));
+        const icon = btn.querySelector('i');
+        icon.classList.toggle('bi-caret-right-fill');
+        icon.classList.toggle('bi-caret-down-fill');
       });
     });
 
-    // Cancel edit
-    document.querySelectorAll('.btn-cancel').forEach(button => {
-      button.addEventListener('click', e => {
-        const row = e.target.closest('tr.edit-row');
-        const id = row.dataset.id;
+    document.querySelectorAll('.btn-add-subfolder').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        const row = document.querySelector(`.subfolder-form-row[data-parent-id="${id}"]`);
+        row?.classList.remove('d-none');
+      });
+    });
+
+    document.querySelectorAll('.btn-cancel-subfolder').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const row = btn.closest('tr');
         row.classList.add('d-none');
+        row.querySelector('input[name="nama"]').value = '';
+        row.querySelector('input[name="deskripsi"]').value = '';
+      });
+    });
+
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tr = btn.closest('tr');
+        const id = tr.dataset.id;
+        tr.style.display = 'none';
+        document.querySelector(`.edit-row[data-id="${id}"]`).classList.remove('d-none');
+      });
+    });
+
+    document.querySelectorAll('.btn-cancel-edit').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        document.querySelector(`.edit-row[data-id="${id}"]`).classList.add('d-none');
         document.querySelector(`tr[data-id="${id}"]`).style.display = '';
       });
     });
   });
 </script>
-
 @endsection

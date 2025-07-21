@@ -40,6 +40,8 @@ public function list(Project $project)
 
 public function index2()
 {
+       // Ambil semua project root (tanpa parent)
+    $projects = Project::with('children')->whereNull('parent_id')->get();
     $projects = Project::all();
     return view('projects.index', compact('projects'));
 }
@@ -51,22 +53,43 @@ public function create()
 
 
     // Simpan data project baru ke database
+    // public function store(Request $request)
+    // {
+    //     // Validasi input
+    //     $validated = $request->validate([
+    //         'nama' => 'required|string|max:255',
+    //         'deskripsi' => 'nullable|string',
+    //     ]);
+
+    //     Project::create([
+    //         'nama' => $validated['nama'],
+    //         'deskripsi' => $validated['deskripsi'] ?? '',
+    //     ]);
+
+    //     return redirect()->route('projects.index2') // sesuaikan dengan route index-mu
+    //                      ->with('success', 'Project added successfully!');
+    // }
+
     public function store(Request $request)
-    {
-        // Validasi input
-        $validated = $request->validate([
-            'nama' => 'required|string|max:255',
-            'deskripsi' => 'nullable|string',
-        ]);
+{
+    // Validasi input termasuk parent_id
+    $validated = $request->validate([
+        'nama' => 'required|string|max:255',
+        'deskripsi' => 'nullable|string',
+        'parent_id' => 'nullable|exists:projects,id', // tambahkan ini
+    ]);
 
-        Project::create([
-            'nama' => $validated['nama'],
-            'deskripsi' => $validated['deskripsi'] ?? '',
-        ]);
+    // Simpan project
+    Project::create([
+        'nama' => $validated['nama'],
+        'deskripsi' => $validated['deskripsi'] ?? '',
+        'parent_id' => $validated['parent_id'] ?? null, // simpan parent_id
+    ]);
 
-        return redirect()->route('projects.index2') // sesuaikan dengan route index-mu
-                         ->with('success', 'Project added successfully!');
-    }
+    return redirect()->route('projects.index2')
+                     ->with('success', 'Project added successfully!');
+}
+
 
 
       // Tampilkan form edit project
@@ -155,6 +178,8 @@ public function updateTaskDates(Request $request)
         'task' => $task,
     ]);
 }
+
+
 
 
 

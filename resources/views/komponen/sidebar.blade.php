@@ -38,11 +38,11 @@
                     <a href="#" class="nav-link {{ request()->is('projects*') ? 'active' : '' }}">
                       <i class="nav-icon bi bi-box-seam-fill"></i>
                       <p>
-                        Projects
+                        Department
                         <i class="nav-arrow bi bi-chevron-right"></i>
                       </p>
                     </a>
-                    <ul class="nav nav-treeview" style="{{ request()->is('projects*') ? 'display: block;' : 'display: none;' }}">
+                    <!-- <ul class="nav nav-treeview" style="{{ request()->is('projects*') ? 'display: block;' : 'display: none;' }}">
                       @foreach($projects_sidebar as $project)
                         <li class="nav-item">
                           <a href="{{ route('projects.show', $project->id) }}"
@@ -52,7 +52,48 @@
                           </a>
                         </li>
                       @endforeach
-                    </ul>
+                    </ul> -->
+
+ <ul class="nav nav-treeview">
+  @foreach($projects_sidebar as $project)
+    @if(is_null($project->parent_id))
+      <li class="nav-item has-treeview">
+        @if($project->children && $project->children->count())
+          <!-- Jika ada anak: buat tombol toggle -->
+          <a href="#" class="nav-link project-toggle">
+            <i class="nav-icon bi bi-folder"></i>
+            <p>
+              {{ $project->nama }}
+              <i class="right fas fa-angle-left"></i>
+            </p>
+          </a>
+
+          <ul class="nav nav-treeview subproject-list" style="display: none;">
+            @foreach($project->children as $child)
+              <li class="nav-item ms-3">
+                <a href="{{ route('projects.show', $child->id) }}"
+                   class="nav-link {{ request()->is('projects/'.$child->id) ? 'active' : '' }}">
+                  <i class="bi bi-circle nav-icon"></i>
+                  <p>{{ $child->nama }}</p>
+                </a>
+              </li>
+            @endforeach
+          </ul>
+        @else
+          <!-- Jika tidak ada anak: langsung link -->
+          <a href="{{ route('projects.show', $project->id) }}"
+             class="nav-link {{ request()->is('projects/'.$project->id) ? 'active' : '' }}">
+            <i class="nav-icon bi bi-folder"></i>
+            <p>{{ $project->nama }}</p>
+          </a>
+        @endif
+      </li>
+    @endif
+  @endforeach
+</ul>
+
+
+
                     </li>
 
                     
@@ -106,3 +147,31 @@
         <!--end::Sidebar Wrapper-->
       </aside>
       <!--end::Sidebar-->
+
+      @push('js')
+
+      <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const toggles = document.querySelectorAll('.project-toggle');
+
+    toggles.forEach(toggle => {
+      toggle.addEventListener('click', function (e) {
+        e.preventDefault(); // Hindari reload
+        const nextUl = this.nextElementSibling;
+        const icon = this.querySelector('.right');
+
+        if (nextUl.style.display === 'none' || nextUl.style.display === '') {
+          nextUl.style.display = 'block';
+          icon.classList.remove('fa-angle-left');
+          icon.classList.add('fa-angle-down');
+        } else {
+          nextUl.style.display = 'none';
+          icon.classList.remove('fa-angle-down');
+          icon.classList.add('fa-angle-left');
+        }
+      });
+    });
+  });
+</script>
+
+      @endpush
