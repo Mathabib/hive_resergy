@@ -60,6 +60,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     
+    
     Route::resource('users', UserController::class);
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -88,7 +89,9 @@ Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
 Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])->name('attachments.destroy');
+Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])
+    ->name('attachments.destroy');
+
 
 // Simpan pengaturan tema (POST / AJAX)
 Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name('theme.update');

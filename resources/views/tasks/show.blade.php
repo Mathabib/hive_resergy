@@ -18,22 +18,39 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
 <div style="display:flex; gap:20px;">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 
   <!-- Form Edit Task -->
   <div style="flex:2;  padding:20px; border-radius:12px;">
     <div class="d-flex justify-content-between">
-      <div class="">
-         <a href="{{ url()->previous() }}" style="text-decoration: none; color: #6b6666ff;">
-        <h2><i class="fa-solid fa-arrow-left"></i></h2>
-      </a>
-      </div>
-      <div class="dropdown">        
-        <span class="float-end fs-5 fw-bold" style="cursor: pointer"  data-bs-toggle="dropdown" aria-expanded="false"><h1>...</h1></span>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="{{ route('task.delete', ['project' => $task->project->id, 'task' => $task->id]) }}">Delete Task</a></li>
-        </ul>
-      </div>
+  <div>
+    <a href="{{ url()->previous() }}" style="text-decoration: none; color: #6b6666ff;">
+      <h2><i class="fa-solid fa-arrow-left"></i></h2>
+    </a>
+  </div>
+  <div>
+   
+    <div class="dropdown d-inline">
+      <span class="float-end fs-5 fw-bold" style="cursor: pointer" data-bs-toggle="dropdown" aria-expanded="false">
+        <h1>...</h1>
+      </span>
+     <ul class="dropdown-menu">
+  <li>
+    <a href="#" id="edit-btn" class="dropdown-item d-flex align-items-center text-warning">
+      <i class="fa-solid fa-pen me-2"></i> Edit Task
+    </a>
+  </li>
+  <li>
+    <a href="{{ route('task.delete', ['project' => $task->project->id, 'task' => $task->id]) }}" 
+       class="dropdown-item d-flex align-items-center text-danger">
+      <i class="fa-solid fa-trash me-2"></i> Delete Task
+    </a>
+  </li>
+</ul>
+
     </div>
+  </div>
+</div>
     <div class="row">
       
       <div class="col-10">
@@ -105,13 +122,13 @@
           </div>
         </div>
       </div>
-    @if(Auth::user()->role == 'admin')      
+   
     <div class="mb-4">
       <label for="attachment" class="form-label fw-bold">Upload Attachment</label>
       <input type="file" name="attachment[]" id="attachment" class="form-control" multiple>
       <small class="form-text text-muted">You can select multiple files at once.</small>
     </div>
-    @endif
+    
 
     <div id="attachment-section" class="mb-4 {{ $task->attachments && $task->attachments->count() > 0 ? '' : 'd-none' }}">
       <label class="form-label fw-bold">Existing Attachments</label>
@@ -127,9 +144,13 @@
               </div>
               <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-secondary">{{ strtoupper(pathinfo($file->filename, PATHINFO_EXTENSION)) }}</span>
-                <button type="button" class="btn btn-sm btn-outline-danger delete-attachment" data-id="{{ $file->id }}">
-                  <i class="bi bi-trash"></i>
-                </button>
+                <button type="button" 
+        class="btn btn-sm btn-outline-danger delete-attachment" 
+        data-id="{{ $file->id }}" 
+        data-url="{{ route('attachments.destroy', $file->id) }}">
+  <i class="bi bi-trash"></i>
+</button>
+
               </div>
             </li>
           @endforeach
@@ -142,12 +163,18 @@
 
       <div class="mb-3">
         <label for="description" name="description" class="form-label">Description</label>
-        <textarea  class="form-control" id="description" rows="10">{{ old('description', $task->description) }}</textarea>
+        <textarea name="description" class="form-control" id="description" rows="10">{{ old('description', $task->description) }}</textarea>
+
       </div>
 
 
 
     </form>
+    <div class="text-end mt-3">
+  <button id="save-btn" class="btn btn-success" style="display:none;">
+    <i class="fa-solid fa-save"></i> Save
+  </button>
+</div>
   </div>
 
   <!-- Comments Section -->
@@ -236,201 +263,228 @@
 
     })
 
-//BAGIAN UNTUK FORM 
-    nama_task_editable = $('#nama_task_editable');
-    nama_task_input = $('#nama_task_input');
-    status_input = $('#status_input');
-    priority_input = $('#priority_input');
-    assign_to_input = $('#assign_to_input');
-    start_date_input = $('#start_date_input');
-    end_date_input = $('#end_date_input');
-    estimate_input = $('#estimate_input');
-    description = $('#description');
-    attachment = $('#attachment');
-    
-
-    function update(value, field){
-      update_url = $('#task-form').data('url');
-      $.ajax({
-        url: update_url,
-        method: 'POST',
-        dataType: 'json',
-        data: {
-          [field]: value
-        },
-        success: function(response) {
-          console.log(response)
-        },
-        error: function(xhr) {
-          console.error('Gagal update:', xhr.responseText);
-        }
-      })
-    }
-
-    function estimate(){
-      let taskid = $('#taskid').data('taskid');
-      let estimateurl = $('#taskid').data('estimateurl');
-      let estimate_update_url = $('#taskid').data('estimate_update_url');
-      
-      //RENDER TAMPILAN ESTIMATE
-      $.ajax({
-        url: estimateurl,
-        method: 'post',
-        dataType: 'json',
-        data: {
-          task: taskid
-        },
-        success: function(response) {
-          let estimate = response
-          //==UPDATE DATABASE
-          $.ajax({
-            url: estimate_update_url,
-            method: 'post',
-            dataType: 'json',
-            data: {
-              estimate: estimate
-            },
-            success: function(response) {    
-              console.log(response);                      
-            },
-            error: function(xhr) {
-              console.error('GAGAL di update database:', xhr.responseText);
-            }
-          })
-          //========
-          
-          $('#estimate_content').html(`${response} Day`);          
-        },
-        error: function(xhr) {
-          console.error('GAGAL:', xhr.responseText);
-        }
-      })
-      
-      
-    }
-
-    nama_task_editable.on('blur', function(){
-      console.log($(this).text());
-      update($(this).text(), 'nama_task');
-    })
-    status_input.on('change', function() {
-      update(status_input.val(), 'status')
-    })
-
-    priority_input.on('change', function() {
-      update(priority_input.val(), 'priority')
-    })
-
-    assign_to_input.on('change', function() {
-      update(assign_to_input.val(), 'assign_to')
-    })
-
-    start_date_input.on('change', function() {
-      update(start_date_input.val(), 'start_date')
-      estimate();
-    })
-
-    end_date_input.on('change', function() {
-      update(end_date_input.val(), 'end_date')
-      estimate();
-    })
-
-    estimate_input.on('change', function() {
-      update(estimate_input.val(), 'estimate')
-    })
-
-    description.on('blur', function() {
-      update(description.val(), 'description')
-    })
-    console.log(url)
-
-
-attachment.on('change', function() {
-  let files = attachment[0].files;
-  let formData = new FormData();
-
-  for (let i = 0; i < files.length; i++) {
-    formData.append('attachment[]', files[i]);
-  }
-
-  let update_url = $('#task-form').data('url');
-
-  $.ajax({
-    url: update_url,
-    method: 'POST',
-    data: formData,
-    processData: false,
-    contentType: false,
-    success: function(response) {
-      if (response.attachments && response.attachments.length > 0) {
-        let list = $('#attachment-list');
-        $('#attachment-section').removeClass('d-none');
-
-        response.attachments.forEach(file => {
-          let ext = file.filename.split('.').pop().toUpperCase();
-
-          // Cek apakah item sudah ada supaya tidak double
-          if ($(`#attachment-item-${file.id}`).length === 0) {
-            let item = `
-              <li class="list-group-item d-flex justify-content-between align-items-center" id="attachment-item-${file.id}">
-                <div class="d-flex align-items-center">
-                  <i class="bi bi-paperclip me-2 text-primary"></i>
-                  <a href="/storage/attachments/${file.filename}" target="_blank" class="text-decoration-none fw-medium">
-                    ${file.filename}
-                  </a>
-                </div>
-                <div class="d-flex align-items-center gap-2">
-                  <span class="badge bg-secondary">${ext}</span>
-                  <button type="button" class="btn btn-sm btn-outline-danger delete-attachment" data-id="${file.id}">
-                    <i class="bi bi-trash"></i>
-                  </button>
-                </div>
-              </li>
-            `;
-            list.append(item);
-          }
-        });
-      }
-    },
-    error: function(xhr) {
-      console.error('Gagal upload file:', xhr.responseText);
-    }
-  });
-});
-
-
-$(document).on('click', '.delete-attachment', function () {
-  let attachmentId = $(this).data('id');
-  let deleteUrl = `/attachments/${attachmentId}`;
-
-  if (!confirm('Yakin ingin menghapus file ini?')) return;
-
-  $.ajax({
-    url: deleteUrl,
-    method: 'POST',
-    data: {
-      _method: 'DELETE',
-      _token: $('meta[name="csrf-token"]').attr('content')
-    },
-    success: function (response) {
-      console.log('Attachment berhasil dihapus:', response);
-      // Optional: Hapus elemen dari DOM
-      $(`button[data-id="${attachmentId}"]`).closest('li').remove();
-    },
-    error: function (xhr) {
-      console.error('Gagal hapus attachment:', xhr.responseText);
-    }
-  });
-});
-
-
-
-
     // Panggil saat halaman selesai dimuat
     loadComments();
     
   });
 </script>
+
+<script>
+$(document).ready(function () {
+  // Disable semua input (kecuali file)
+  $('#task-form :input').not('#attachment').prop('disabled', true);
+  $('#attachment').prop('disabled', true); // Disable file input saat awal
+  $('#nama_task_editable').attr('contenteditable', false);
+
+  // Disable tombol delete file saat awal
+  disableDeleteButtons();
+
+  // Tombol Edit
+  $('#edit-btn').on('click', function () {
+    $('#task-form :input').not('#attachment').prop('disabled', false); // Enable semua input kecuali file
+    $('#attachment').prop('disabled', false); // Aktifkan upload file
+    $('#nama_task_editable').attr('contenteditable', true);
+
+    // Aktifkan tombol delete file
+    enableDeleteButtons();
+
+    $(this).hide();
+    $('#save-btn').show();
+  });
+
+  // Tombol Save
+  $('#save-btn').on('click', function (e) {
+    e.preventDefault();
+
+    // Ambil contenteditable dan masukkan ke hidden input
+    $('#nama_task_input').val($('#nama_task_editable').text());
+
+    // Buat FormData dari form
+    let formData = new FormData($('#task-form')[0]);
+
+    // Hilangkan file jika tidak ingin dikirim bersamaan
+    formData.delete('attachment');
+
+    // CSRF token
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+    // Kirim AJAX
+    $.ajax({
+      url: $('#task-form').data('url'),
+      method: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        alert('Task saved successfully!');
+
+        $('#task-form :input').not('#attachment').prop('disabled', true);
+        $('#attachment').prop('disabled', true); // Disable upload file lagi
+        $('#nama_task_editable').attr('contenteditable', false);
+
+        // Disable tombol delete file lagi
+        disableDeleteButtons();
+
+        $('#save-btn').hide();
+        $('#edit-btn').show();
+
+        loadAttachments(response.attachments);
+      },
+      error: function (xhr) {
+        console.error('Error:', xhr.responseText);
+        alert('Gagal menyimpan task.');
+      }
+    });
+  });
+
+  // Upload file otomatis saat dipilih (hanya jika input file enabled)
+  $('#attachment').on('change', function () {
+    if ($(this).prop('disabled')) {
+      alert('Klik tombol Edit dulu untuk menambahkan file.');
+      return;
+    }
+
+    let formData = new FormData($('#task-form')[0]);
+    formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+
+    $.ajax({
+      url: $('#task-form').data('url'),
+      method: 'POST',
+      data: formData,
+      processData: false,
+      contentType: false,
+      success: function (response) {
+        alert('File uploaded successfully!');
+        loadAttachments(response.attachments);
+         $('#attachment').val('');
+      },
+      error: function (xhr) {
+        console.error('Gagal upload file:', xhr.responseText);
+      }
+    });
+  });
+
+  // Load ulang attachment list
+function loadAttachments(attachments) {
+    let list = $('#attachment-list');
+    list.empty();
+    if (attachments.length > 0) {
+        $('#attachment-section').removeClass('d-none');
+        attachments.forEach(file => {
+            let ext = file.filename.split('.').pop().toUpperCase();
+            let item = `
+                <li class="list-group-item d-flex justify-content-between align-items-center" id="attachment-item-${file.id}">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-paperclip me-2 text-primary"></i>
+                        <a href="/storage/attachments/${file.filename}" target="_blank" class="text-decoration-none fw-medium">
+                            ${file.filename}
+                        </a>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-secondary">${ext}</span>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-danger delete-attachment disabled" 
+                                data-id="${file.id}" 
+                                data-url="${file.delete_url}"
+                                disabled>
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </div>
+                </li>`;
+            list.append(item);
+        });
+    } else {
+        $('#attachment-section').addClass('d-none');
+    }
+}
+
+// Saat klik Edit → aktifkan delete file
+$('#edit-btn').on('click', function () {
+    enableDeleteButtons();
+});
+
+// Saat klik Save → disable delete file lagi
+$('#save-btn').on('click', function () {
+    disableDeleteButtons();
+});
+
+// Hapus file (pastikan tombol aktif)
+$(document).on('click', '.delete-attachment', function () {
+    if ($(this).prop('disabled')) {
+        alert('Klik tombol Edit dulu untuk menghapus file.');
+        return;
+    }
+
+    let attachmentId = $(this).data('id');
+    let deleteUrl = $(this).data('url');
+    if (!deleteUrl) {
+        alert('URL delete tidak ditemukan.');
+        return;
+    }
+
+    if (!confirm('Are you sure want to delete this file?')) return;
+
+    let button = $(this);
+    button.prop('disabled', true).addClass('disabled').html('<i class="fa fa-spinner fa-spin"></i>');
+
+    $.ajax({
+        url: deleteUrl,
+        type: 'POST',
+        data: {
+            _method: 'DELETE',
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (response) {
+            console.log(response.message);
+            $(`#attachment-item-${attachmentId}`).fadeOut(300, function () {
+                $(this).remove();
+                if ($('#attachment-list li').length === 0) {
+                    $('#attachment-section').addClass('d-none');
+                }
+            });
+        },
+        error: function (xhr) {
+            console.error('Gagal hapus attachment:', xhr.responseText);
+            alert('Failed to delete file!');
+            button.prop('disabled', false).removeClass('disabled').html('<i class="bi bi-trash"></i>');
+        }
+    });
+});
+
+// Helpers
+function disableDeleteButtons() {
+    $('.delete-attachment').prop('disabled', true).addClass('disabled');
+}
+
+function enableDeleteButtons() {
+    $('.delete-attachment').prop('disabled', false).removeClass('disabled');
+}
+
+});
+</script>
+
+<script>
+  function updateEstimate() {
+  const start = new Date($('#start_date_input').val());
+  const end = new Date($('#end_date_input').val());
+
+  if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && end >= start) {
+    const diffTime = Math.abs(end - start);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // +1 biar hari awal & akhir ikut
+    $('#estimate_content').text(`${diffDays} Days`);
+  } else {
+    $('#estimate_content').text('0 Days');
+  }
+}
+
+// Jalankan setiap kali user ubah tanggal
+$('#start_date_input, #end_date_input').on('change', updateEstimate);
+
+// Jalankan sekali saat halaman load
+updateEstimate();
+
+</script>
+
 
 
 

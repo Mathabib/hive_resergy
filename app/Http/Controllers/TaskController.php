@@ -67,62 +67,142 @@ class TaskController extends Controller
     }
 
 
- public function update(Request $request, Task $task)
+//  public function update(Request $request, Task $task)
+// {
+//     $request->validate([
+//         'nama_task' => 'nullable|string|max:255',
+//         'status' => 'nullable|in:todo,inprogress,done',
+//         'start_date' => 'nullable|date',
+//         'end_date' => 'nullable|date|after_or_equal:start_date',
+//         'estimate' => 'nullable',
+//         'assign_to' => 'nullable|exists:users,id',
+//         'priority' => 'nullable|in:low,medium,high',
+//         'description' => 'nullable',
+//         'attachment.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+//     ]);
+
+//     $data = [];
+
+//     if ($request->filled('nama_task')) $data['nama_task'] = $request->nama_task;
+//     if ($request->filled('status')) $data['status'] = $request->status;
+//     if ($request->filled('start_date')) $data['start_date'] = $request->start_date;
+//     if ($request->filled('end_date')) $data['end_date'] = $request->end_date;
+//     if ($request->filled('estimate')) $data['estimate'] = $request->estimate;
+//     if ($request->filled('assign_to')) $data['assign_to'] = $request->assign_to;
+//     if ($request->filled('priority')) $data['priority'] = $request->priority;
+//     if ($request->filled('description')) $data['description'] = $request->description;
+
+//     if (!empty($data)) {
+//         $task->update($data);
+//     }
+
+//     $newAttachments = collect();
+
+//     if ($request->hasFile('attachment')) {
+//         foreach ($request->file('attachment') as $file) {
+//             $file->storeAs('attachments', $file->getClientOriginalName(), 'public');
+
+//             $task->attachments()->create([
+//                 'filename' => $file->getClientOriginalName(),
+//             ]);
+//         }
+//     }
+
+//     // Load ulang attachments supaya yang baru juga ikut
+//     $task->load('attachments');
+
+//     // Return JSON dengan attachments terbaru
+//     return response()->json([
+//         'attachments' => $task->attachments,
+//     ]);
+// }
+
+
+public function update(Request $request, Task $task)
 {
+    // ✅ Validasi input
     $request->validate([
-        'nama_task' => 'nullable|string|max:255',
-        'status' => 'nullable|in:todo,inprogress,done',
-        'start_date' => 'nullable|date',
-        'end_date' => 'nullable|date|after_or_equal:start_date',
-        'estimate' => 'nullable',
-        'assign_to' => 'nullable|exists:users,id',
-        'priority' => 'nullable|in:low,medium,high',
-        'description' => 'nullable',
+        'nama_task'    => 'nullable|string|max:255',
+        'status'       => 'nullable|in:todo,inprogress,done',
+        'start_date'   => 'nullable|date',
+        'end_date'     => 'nullable|date|after_or_equal:start_date',
+        'assign_to'    => 'nullable|exists:users,id',
+        'priority'     => 'nullable|in:low,medium,high',
+        'description'  => 'nullable|string',
         'attachment.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
     ]);
 
     $data = [];
 
-    if ($request->filled('nama_task')) $data['nama_task'] = $request->nama_task;
-    if ($request->filled('status')) $data['status'] = $request->status;
-    if ($request->filled('start_date')) $data['start_date'] = $request->start_date;
-    if ($request->filled('end_date')) $data['end_date'] = $request->end_date;
-    if ($request->filled('estimate')) $data['estimate'] = $request->estimate;
-    if ($request->filled('assign_to')) $data['assign_to'] = $request->assign_to;
-    if ($request->filled('priority')) $data['priority'] = $request->priority;
+    // ✅ Masukkan field yang ada ke array $data
+    if ($request->filled('nama_task'))   $data['nama_task']   = $request->nama_task;
+    if ($request->filled('status'))      $data['status']      = $request->status;
+    if ($request->filled('start_date'))  $data['start_date']  = $request->start_date;
+    if ($request->filled('end_date'))    $data['end_date']    = $request->end_date;
+    if ($request->filled('assign_to'))   $data['assign_to']   = $request->assign_to;
+    if ($request->filled('priority'))    $data['priority']    = $request->priority;
     if ($request->filled('description')) $data['description'] = $request->description;
 
+    // ✅ Hitung estimate kalau ada start_date & end_date
+    if ($request->filled('start_date') && $request->filled('end_date')) {
+        $start = \Carbon\Carbon::parse($request->start_date);
+        $end   = \Carbon\Carbon::parse($request->end_date);
+
+        $estimate = $start->diffInDays($end) + 1; // +1 untuk include hari awal & akhir
+        $data['estimate'] = $estimate;
+    }
+
+    // ✅ Update task hanya kalau ada perubahan
     if (!empty($data)) {
         $task->update($data);
     }
 
-    $newAttachments = collect();
-
+    // ✅ Handle file attachment
     if ($request->hasFile('attachment')) {
         foreach ($request->file('attachment') as $file) {
-            $file->storeAs('attachments', $file->getClientOriginalName(), 'public');
+            // Simpan file ke storage/app/public/attachments
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('attachments', $filename, 'public');
 
+            // Simpan record ke DB
             $task->attachments()->create([
-                'filename' => $file->getClientOriginalName(),
+                'filename' => $filename,
             ]);
         }
     }
 
-    // Load ulang attachments supaya yang baru juga ikut
+    // ✅ Load ulang relasi attachments
     $task->load('attachments');
 
-    // Return JSON dengan attachments terbaru
-    return response()->json([
-        'attachments' => $task->attachments,
-    ]);
+   return response()->json([
+    'message'     => 'Task berhasil diperbarui.',
+    'task'        => $task,
+    'attachments' => $task->attachments->map(function ($file) {
+        return [
+            'id'          => $file->id,
+            'filename'    => $file->filename,
+            'delete_url'  => route('attachments.destroy', $file->id),
+        ];
+    }),
+]);
+
 }
+
+
 
 public function destroyAttachment(Attachment $attachment)
 {
-    Storage::delete('public/attachments/' . $attachment->filename);
-    $attachment->delete();
+    // Path yang sesuai dengan Laravel storage
+    $filePath = 'attachments/' . $attachment->filename;
+
+    if (Storage::disk('public')->exists($filePath)) {
+        Storage::disk('public')->delete($filePath); // hapus file di storage
+    }
+
+    $attachment->delete(); // hapus database
 
     return response()->json(['message' => 'Attachment deleted successfully.']);
 }
+
 
 }

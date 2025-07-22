@@ -34,7 +34,9 @@ public function show(Project $project)
 
 public function list(Project $project)
 {
-    $tasks = $project->tasks()->paginate(25); // 10 per halaman, bisa kamu ubah
+    $tasks = $project->tasks()
+                     ->with('assignToUser') // <-- bagian ini kita set relasi user
+                     ->paginate(25);
     return view('projects.list', compact('project', 'tasks'));
 }
 
@@ -179,6 +181,7 @@ public function updateTaskDates(Request $request)
         'task' => $task,
     ]);
 }
+
 
 
 

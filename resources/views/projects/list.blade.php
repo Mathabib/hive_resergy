@@ -105,7 +105,9 @@
                         <td>{{ $item->start_date }}</td>
                         <td>{{ $item->end_date }}</td>
                         <td>{{ $item->priority }}</td>
-                        <td>{{ $item->assign_to }}</td>
+                       <td>{{ optional($item->assignToUser)->name ?? '-' }}</td>
+
+ 
                       </tr>
                     @empty
                       <tr>
