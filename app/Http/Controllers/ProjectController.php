@@ -8,18 +8,143 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Task;
 use App\Models\User;
+use Carbon\Carbon;
 
 class ProjectController extends Controller
 {
-    public function index()
-    {
-        if(Auth::user()->role == 'admin'){
-            $projects_sidebar = Project::all();
-        } else{
-            $projects_sidebar = Auth::user()->projects;
+    // public function index()
+    // {
+    //     if(Auth::user()->role == 'admin'){
+    //         $projects_sidebar = Project::all();
+    //     } else{
+    //         $projects_sidebar = Auth::user()->projects;
+    //     }
+    //     return view('dashboard', compact('projects_sidebar'));
+    // }
+
+public function index()
+{
+    if (Auth::user()->role == 'admin') {
+        // ✅ Data untuk admin
+        $totalProjects = Project::count();
+        $totalTasks = Task::count();
+        $totalUsers = \App\Models\User::count();
+
+        $activeUsersToday = \App\Models\User::whereDate('last_login', Carbon::today())->count();
+
+        $tasksPerProject = Project::withCount('tasks')->get();
+
+        // ✅ Hitung task per status (ADMIN: semua project)
+        $todoTasks = Task::where('status', 'todo')->count();
+        $inprogressTasks = Task::where('status', 'inprogress')->count();
+        $doneTasks = Task::where('status', 'done')->count();
+
+        // 📊 Hitung jumlah task per bulan untuk setiap status
+        $months = collect(range(1, 12))->map(function ($month) {
+            return Carbon::create()->month($month)->format('M');
+        });
+
+        $todoTasksPerMonth = [];
+        $inprogressTasksPerMonth = [];
+        $doneTasksPerMonth = [];
+
+        foreach (range(1, 12) as $month) {
+            $todoTasksPerMonth[] = Task::where('status', 'todo')
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            $inprogressTasksPerMonth[] = Task::where('status', 'inprogress')
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            $doneTasksPerMonth[] = Task::where('status', 'done')
+                ->whereMonth('created_at', $month)
+                ->count();
         }
-        return view('dashboard', compact('projects_sidebar'));
+
+        // ✅ Task summary untuk admin
+        $taskStats = [
+            'completed'   => $doneTasks,
+            'in_progress' => $inprogressTasks,
+            'pending'     => $todoTasks,
+        ];
+
+        return view('dashboard', compact(
+            'totalProjects',
+            'totalTasks',
+            'totalUsers',
+            'activeUsersToday',
+            'tasksPerProject',
+            'months',
+            'todoTasksPerMonth',
+            'inprogressTasksPerMonth',
+            'doneTasksPerMonth',
+            'todoTasks',
+            'inprogressTasks',
+            'doneTasks',
+            'taskStats'
+        ));
+    } else {
+        // ✅ Data untuk user
+        $projects_sidebar = Auth::user()->projects; // ambil project yang user punya akses
+        $projectIds = $projects_sidebar->pluck('id'); // ambil semua ID project user
+
+        // ✅ Hitung task di semua project user
+        $todoTasks = Task::whereIn('project_id', $projectIds)
+            ->where('status', 'todo')
+            ->count();
+
+        $inprogressTasks = Task::whereIn('project_id', $projectIds)
+            ->where('status', 'inprogress')
+            ->count();
+
+        $doneTasks = Task::whereIn('project_id', $projectIds)
+            ->where('status', 'done')
+            ->count();
+
+        $totalTasks = Task::whereIn('project_id', $projectIds)->count();
+
+        // 📊 Hitung jumlah task per bulan untuk user (hanya task di project yang user akses)
+        $months = collect(range(1, 12))->map(function ($month) {
+            return Carbon::create()->month($month)->format('M');
+        });
+
+        $todoTasksPerMonth = [];
+        $inprogressTasksPerMonth = [];
+        $doneTasksPerMonth = [];
+
+        foreach (range(1, 12) as $month) {
+            $todoTasksPerMonth[] = Task::whereIn('project_id', $projectIds)
+                ->where('status', 'todo')
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            $inprogressTasksPerMonth[] = Task::whereIn('project_id', $projectIds)
+                ->where('status', 'inprogress')
+                ->whereMonth('created_at', $month)
+                ->count();
+
+            $doneTasksPerMonth[] = Task::whereIn('project_id', $projectIds)
+                ->where('status', 'done')
+                ->whereMonth('created_at', $month)
+                ->count();
+        }
+
+        return view('dashboard', compact(
+            'projects_sidebar',
+            'todoTasks',
+            'inprogressTasks',
+            'doneTasks',
+            'totalTasks',
+            'months',
+            'todoTasksPerMonth',
+            'inprogressTasksPerMonth',
+            'doneTasksPerMonth'
+        ));
     }
+}
+
+
 
 
 

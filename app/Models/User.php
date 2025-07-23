@@ -22,7 +22,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role'
+        'role',
+        'last_login',
     ];
 
     /**
@@ -58,6 +59,8 @@ class User extends Authenticatable
 
     $this->notify(new ResetPassword($token));
 }
+
+
 
 
 }

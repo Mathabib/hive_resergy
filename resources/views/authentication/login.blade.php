@@ -76,7 +76,7 @@
     .input-group .form-control {
       border-radius: 10px 0 0 10px;
       background-color: rgba(255, 255, 255, 0.1);
-      color: #fff;
+      color: #000;
       border: none;
     }
 
@@ -101,7 +101,7 @@
 
     .form-control:focus {
       background-color: rgba(255, 255, 255, 0.2);
-      color: white;
+      color: #000;
       outline: none;
       box-shadow: none;
     }

@@ -12,6 +12,37 @@ use App\Models\Attachment;
 
 class TaskController extends Controller
 {
+
+public function index()
+{
+    $query = Task::with('project', 'assignToUser');
+
+    // ✅ Filter pencarian
+    if (request('search')) {
+        $query->where('nama_task', 'like', '%' . request('search') . '%');
+    }
+
+    // ✅ Filter status
+    if (request('status')) {
+        $query->where('status', request('status'));
+    }
+
+    // ✅ Filter project
+    if (request('project_id')) {
+        $query->where('project_id', request('project_id'));
+    }
+
+    // ✅ Pagination
+    $tasks = $query->paginate(10)->withQueryString();
+
+    // ✅ Kirim semua project untuk dropdown
+    $projects = \App\Models\Project::all();
+
+    return view('tasks.index', compact('tasks', 'projects'));
+}
+
+
+
     public function store(Request $request)
     {
         // $validated = $request->validate([

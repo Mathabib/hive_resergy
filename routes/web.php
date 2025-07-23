@@ -60,8 +60,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('/projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
     
-    
+    Route::get('users/activeToday', [UserController::class, 'activeToday'])->name('users.activeToday');
     Route::resource('users', UserController::class);
+  
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -86,6 +88,7 @@ Route::middleware('auth')->group(function () {
    Route::get('/theme-settings', [ThemeController::class, 'index'])->name('theme.index');
 
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
 Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
 Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');

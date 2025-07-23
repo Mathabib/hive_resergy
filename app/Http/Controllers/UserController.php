@@ -6,9 +6,18 @@ use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
+
+public function activeToday()
+{
+    $activeUsers = User::whereDate('last_login', Carbon::today())->get();
+
+    return view('users.active_today', compact('activeUsers'));
+}
+
     // Tampilkan daftar user
   public function index()
 {
