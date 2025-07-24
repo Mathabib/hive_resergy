@@ -1,2 +1,10 @@
 email : hive@isolutions.co.id
 pass  : H1v3#2025
+
+untuk migrasi assign to lama ke pivot table
+
+php artisan tinker
+
+\App\Models\Task::whereNotNull('assign_to')->each(function ($task) {
+    $task->assignedUsers()->syncWithoutDetaching([$task->assign_to]);
+});

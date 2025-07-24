@@ -105,7 +105,17 @@
                         <td>{{ $item->start_date }}</td>
                         <td>{{ $item->end_date }}</td>
                         <td>{{ $item->priority }}</td>
-                       <td>{{ optional($item->assignToUser)->name ?? '-' }}</td>
+                       <td>
+                        @if($item->assignedUsers->count())
+                          <ul class="mb-0 ps-3">
+                            @foreach($item->assignedUsers as $user)
+                              <li>{{ $user->name }}</li>
+                            @endforeach
+                          </ul>
+                        @else
+                          -
+                        @endif
+                      </td>
 
  
                       </tr>

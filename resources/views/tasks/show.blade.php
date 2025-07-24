@@ -91,14 +91,19 @@
           <div role="row" class="d-flex mb-3">
             <div role="cell" class="me-3 cell-label" >Assign To</div> 
             <div role="cell" class=" cell-konten">
-              <select  class="form-control form-control-sm" name="assign_to" id="assign_to_input" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-                <option value="">-- None --</option>
-                @foreach(App\Models\User::all() as $user)
-                  <option value="{{ $user->id }}" @if(old('assign_to', $task->assign_to) == $user->id) selected @endif>{{ $user->name }}</option>
-                @endforeach
-              </select>
+              <select multiple class="form-control form-control-sm" name="assign_to[]" id="assign_to_input" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
+              @foreach(App\Models\User::all() as $user)
+                <option value="{{ $user->id }}" 
+                  @if(in_array($user->id, old('assign_to', $task->assignedUsers->pluck('id')->toArray()))) selected @endif>
+                  {{ $user->name }}
+                </option>
+              @endforeach
+            </select>
+                  <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
+                  * Hold <strong>Ctrl</strong> (Windows) or <strong>Cmd ⌘</strong> (Mac) to select multiple users.
+                </small>
             </div>
-          </div>          
+          </div>      
         </div>
 
         <div role="table">
@@ -293,17 +298,23 @@ $(document).ready(function () {
   });
 
   // Tombol Save
-  $('#save-btn').on('click', function (e) {
+ $('#save-btn').on('click', function (e) {
     e.preventDefault();
-
-    // Ambil contenteditable dan masukkan ke hidden input
-    $('#nama_task_input').val($('#nama_task_editable').text());
 
     // Buat FormData dari form
     let formData = new FormData($('#task-form')[0]);
 
+    // Ambil contenteditable dan tambahkan langsung ke FormData
+    let namaTask = $('#nama_task_editable').text().trim();
+    formData.append('nama_task', namaTask);
+
     // Hilangkan file jika tidak ingin dikirim bersamaan
     formData.delete('attachment');
+
+    // Debug: cek isi FormData sebelum dikirim
+    for (var pair of formData.entries()) {
+      console.log(pair[0]+ ': ' + pair[1]);
+    }
 
     // CSRF token
     formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
@@ -318,11 +329,10 @@ $(document).ready(function () {
       success: function (response) {
         alert('Task saved successfully!');
 
-        $('#task-form :input').not('#attachment').prop('disabled', true);
+        $('#task-form :input').not('#attachment, #nama_task_input').prop('disabled', true);
         $('#attachment').prop('disabled', true); // Disable upload file lagi
         $('#nama_task_editable').attr('contenteditable', false);
 
-        // Disable tombol delete file lagi
         disableDeleteButtons();
 
         $('#save-btn').hide();
@@ -335,7 +345,8 @@ $(document).ready(function () {
         alert('Gagal menyimpan task.');
       }
     });
-  });
+});
+
 
   // Upload file otomatis saat dipilih (hanya jika input file enabled)
   $('#attachment').on('change', function () {

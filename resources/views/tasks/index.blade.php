@@ -105,7 +105,9 @@
         </div>
 
         <div class="card-footer">
-            {{ $tasks->links() }}
+          <div class="float-end">
+                {{ $tasks->links('pagination::bootstrap-5') }}
+              </div>
         </div>
     </div>
 </div>

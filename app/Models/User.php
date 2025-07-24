@@ -60,6 +60,10 @@ class User extends Authenticatable
     $this->notify(new ResetPassword($token));
 }
 
+public function tasks()
+{
+    return $this->belongsToMany(Task::class, 'task_user');
+}
 
 
 
