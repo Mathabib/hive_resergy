@@ -92,7 +92,7 @@
             <div role="cell" class="me-3 cell-label" >Assign To</div> 
             <div role="cell" class=" cell-konten">
               <select multiple class="form-control form-control-sm" name="assign_to[]" id="assign_to_input" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-              @foreach(App\Models\User::all() as $user)
+                @foreach($task->project->users as $user)
                 <option value="{{ $user->id }}" 
                   @if(in_array($user->id, old('assign_to', $task->assignedUsers->pluck('id')->toArray()))) selected @endif>
                   {{ $user->name }}
@@ -107,24 +107,38 @@
         </div>
 
         <div role="table">
-          <div role="row" class="d-flex mb-3">
-            <div role="cell" class="me-3 cell-label" >Date Start</div> 
-            <div role="cell" class=" cell-konten">
-              <input  class="form-control form-control-sm" type="date" name="start_date" id="start_date_input"  value="{{ old('start_date', $task->start_date ? \Carbon\Carbon::parse($task->start_date)->format('Y-m-d') : '') }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-            </div>
+         <div role="row" class="d-flex mb-3">
+          <div role="cell" class="me-3 cell-label">Date Start</div>
+          <div role="cell" class="cell-konten">
+            <input 
+              class="form-control form-control-sm" 
+              type="date" 
+              name="start_date" 
+              id="start_date_input"  
+              value="{{ old('start_date', $task->start_date ? \Carbon\Carbon::parse($task->start_date)->format('Y-m-d') : '') }}" 
+              style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
           </div>
-          <div role="row" class="d-flex mb-3">
-            <div role="cell" class="me-3 cell-label" >Deadline</div> 
-            <div role="cell" class=" cell-konten">
-              <input  class="form-control form-control-sm" type="date" name="end_date" id="end_date_input" value="{{ old('end_date', $task->end_date ? \Carbon\Carbon::parse($task->end_date)->format('Y-m-d') : '' ) }}" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-            </div>
+        </div>
+
+         <div role="row" class="d-flex mb-3">
+          <div role="cell" class="me-3 cell-label">Deadline</div>
+          <div role="cell" class="cell-konten">
+            <input 
+              class="form-control form-control-sm" 
+              type="date" 
+              name="end_date" 
+              id="end_date_input" 
+              value="{{ old('end_date', $task->end_date ? \Carbon\Carbon::parse($task->end_date)->format('Y-m-d') : '' ) }}" 
+              style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
           </div>
-          <div role="row" class="d-flex mb-3">
-            <div role="cell" class="me-3 cell-label" >Time Estimate</div> 
-            <div role="cell" class=" cell-konten" id="taskid" data-taskid="{{ $task->id }}" data-estimateurl="{{ route('tasks.estimate.api', ['task' => $task->id]) }}" data-estimate_update_url="{{ route('tasks.update.api', ['task' => $task->id]) }}">
-              <span id="estimate_content">{{ $estimate }} Days</span>
-            </div>
+        </div>
+                <div role="row" class="d-flex mb-3">
+          <div role="cell" class="me-3 cell-label">Time Estimate</div>
+          <div role="cell" class="cell-konten">
+            <span id="estimate_content">{{ $estimate }} Days</span>
           </div>
+          
+        </div>
         </div>
       </div>
    
@@ -200,42 +214,90 @@
 
 <script src="{{ asset('js/jquery.js') }}"></script>
 
+
 <script>
-  $(document).ready(function() {
-    var url = $('#comments-container').data('url'); // ambil data-url dengan jQuery
+document.addEventListener('DOMContentLoaded', function () {
+  const startDateInput = document.getElementById('start_date_input');
+  const endDateInput = document.getElementById('end_date_input');
+  const estimateContent = document.getElementById('estimate_content');
+
+  startDateInput.addEventListener('change', function () {
+    const startDateStr = this.value;
+    const estimateMatch = estimateContent.textContent.trim().match(/(\d+)/);
+    const estimateDays = estimateMatch ? parseInt(estimateMatch[1]) : 0;
+
+    if (startDateStr && estimateDays > 0) {
+      const startDate = new Date(startDateStr);
+      startDate.setDate(startDate.getDate() + estimateDays);
+
+      const yyyy = startDate.getFullYear();
+      const mm = String(startDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(startDate.getDate()).padStart(2, '0');
+      const newEndDate = `${yyyy}-${mm}-${dd}`;
+
+      endDateInput.value = newEndDate;
+    }
+  });
+});
+</script>
+
+
+
+<script>
+  $(document).ready(function () {
+    var url = $('#comments-container').data('url');
+
+    function formatTanggal(dateStr) {
+      const options = {
+        weekday: 'long', day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      };
+      return new Date(dateStr).toLocaleString('id-ID', options);
+    }
 
     function loadComments() {
       $.ajax({
         url: url,
         method: 'GET',
         dataType: 'json',
-        success: function(response) {
+        success: function (response) {
           var container = $('#comments-container');
-          container.empty(); // kosongkan dulu
+          container.empty();
 
-          console.log(response);
-
-          $.each(response, function(index, comment) {
+          $.each(response, function (index, comment) {
             var html = `
-              <div style="padding:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                <small><strong>${comment.user.name}</strong></small>
-                <small>${new Date(comment.created_at).toLocaleString()}</small>
+              <div style="padding:10px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.1); margin-bottom: 12px;">
+                <small><strong>${comment.user.name}</strong></small><br>
+                <small>${formatTanggal(comment.created_at)}</small>
                 <p>${comment.content}</p>
               </div>
             `;
             container.append(html);
           });
         },
-        error: function(xhr, status, error) {
+        error: function (xhr, status, error) {
           console.error('Gagal mengambil komentar:', error);
         }
       });
     }
 
     function kirimKomentar() {
-      let userID = $('#comments-container').data('userid')
-      let url = $('#comments-container').data('url')
-      let comment = $('#comment-input').val()
+      let userID = $('#comments-container').data('userid');
+      let comment = $('#comment-input').val();
+
+      $('#kirim_comment').prop('disabled', true).text('Mengirim...');
+
+      // tampilkan komentar sementara (loading)
+      var container = $('#comments-container');
+      var tempHtml = `
+        <div id="temp-comment" style="padding:10px; border-radius:8px; background:#f0f0f0; margin-bottom:12px;">
+          <small><strong>Anda</strong></small><br>
+          <small>sedang mengirim...</small>
+          <p>${comment}</p>
+        </div>
+      `;
+      container.prepend(tempHtml);
+
       $.ajax({
         url: url,
         method: 'POST',
@@ -243,36 +305,36 @@
           user_id: userID,
           comment: comment
         },
-        success: function(response) {
+        success: function (response) {
           console.log('Komentar berhasil ditambahkan:', response);
           $('#comment-input').val('');
+          $('#temp-comment').remove();
           loadComments();
         },
-        error: function(xhr) {
+        error: function (xhr) {
           console.error('Gagal menambahkan komentar:', xhr.responseJSON);
+          $('#temp-comment').remove();
+          alert('Gagal mengirim komentar.');
+        },
+        complete: function () {
+          $('#kirim_comment').prop('disabled', false).text('Kirim');
         }
       });
-
     }
 
-    $('#kirim_comment').on('click', function() {
-      console.log('tombol kirim bekerja dengan baik alhamdulillah')
-      comment = $('#comment-input').val();
-      let userID = $('#comments-container').data('userid')
-        if (comment.trim()) {
-          kirimKomentar()
-          console.log(userID)
-        } else {
-          alert('Comment cannot be empty!');
-        }
+    $('#kirim_comment').on('click', function () {
+      const comment = $('#comment-input').val();
+      if (comment.trim()) {
+        kirimKomentar();
+      } else {
+        alert('Komentar tidak boleh kosong!');
+      }
+    });
 
-    })
-
-    // Panggil saat halaman selesai dimuat
     loadComments();
-    
   });
 </script>
+
 
 <script>
 $(document).ready(function () {
@@ -495,6 +557,7 @@ $('#start_date_input, #end_date_input').on('change', updateEstimate);
 updateEstimate();
 
 </script>
+
 
 
 

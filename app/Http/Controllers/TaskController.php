@@ -8,10 +8,29 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Attachment;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log; 
+use App\Mail\TaskAssignedMail;
+use Illuminate\Support\Facades\Mail;
 
 
 class TaskController extends Controller
 {
+
+public function myAssignedTasks()
+{
+    $user = Auth::user();
+
+    $tasks = Task::whereHas('assignedUsers', function ($query) use ($user) {
+        $query->where('user_id', $user->id);
+    })->latest()->paginate(25);
+
+    // Kirim variabel projects jika memang dibutuhkan oleh view
+    $projects = Project::all(); // atau sesuai kebutuhan
+
+    return view('tasks.index', compact('tasks', 'projects'));
+}
+
 
 public function index()
 {
@@ -43,23 +62,37 @@ public function index()
 
 
 
-    public function store(Request $request)
-    {
-        // $validated = $request->validate([
-        //     'project_id' => 'required|exists:projects,id',
-        //     'nama_task' => 'required|string|max:255',
-        //     'status' => 'required|in:todo,inprogress,done',
-        // ]);
 
-        $task = Task::create([
-            'project_id' => $request->project_id,
-            'nama_task' => $request->nama_task,
-            'status' => $request->status,
-            'description' => $request->description
-        ]);
 
-        return response()->json(['task' => $task], 201);
+
+   public function store(Request $request)
+{
+    // Validasi input (aktifkan jika perlu)
+    // $validated = $request->validate([
+    //     'project_id' => 'required|exists:projects,id',
+    //     'nama_task' => 'required|string|max:255',
+    //     'status' => 'required|in:todo,inprogress,done',
+    //     'assigned_user_ids' => 'array' // misalnya kamu kirim array user ID
+    // ]);
+
+    // Simpan task baru
+    $task = Task::create([
+        'project_id' => $request->project_id,
+        'nama_task'  => $request->nama_task,
+        'status'     => $request->status,
+        'description'=> $request->description,
+    ]);
+
+    // Assign user ke task (jika ada)
+    if ($request->has('assigned_user_ids')) {
+        foreach ($request->assigned_user_ids as $userId) {
+            $task->assignedUsers()->attach($userId, ['is_read' => false]);
+        }
     }
+
+    return response()->json(['task' => $task], 201);
+}
+
 
     public function updateStatus(Request $request)
     {
@@ -81,15 +114,40 @@ public function index()
         return redirect(route('projects.show', $project->id));
     }
 
-    public function show(Task $task)
-    {
-        $task->load('assignToUser', 'comments.user', 'project');
-        $estimate = 0;
-        if($task->start_date != null && $task->end_date != null){
-            $estimate = Carbon::parse($task->end_date)->diffInDays(Carbon::parse($task->start_date)) + 1;            
-        }        
-        return view('tasks.show', compact('task', 'estimate'));
+    // public function show(Task $task)
+    // {
+    //     $task->load('assignToUser', 'comments.user', 'project');
+    //     $estimate = 0;
+    //     if($task->start_date != null && $task->end_date != null){
+    //         $estimate = Carbon::parse($task->end_date)->diffInDays(Carbon::parse($task->start_date)) + 1;            
+    //     }        
+    //     return view('tasks.show', compact('task', 'estimate'));
+    // }
+
+
+
+public function show(Task $task)
+{
+    // Load relasi assignedUsers agar bisa akses pivot (is_read)
+    $task->load('assignedUsers', 'comments.user', 'project');
+
+    // Cek apakah user yang sedang login termasuk yang di-assign
+    if ($task->assignedUsers->contains(Auth::id())) {
+        // Tandai sebagai sudah dibaca di pivot
+        $task->assignedUsers()->updateExistingPivot(Auth::id(), [
+            'is_read' => true
+        ]);
     }
+
+    // Hitung estimasi durasi (dalam hari)
+    $estimate = 0;
+    if ($task->start_date && $task->end_date) {
+        $estimate = Carbon::parse($task->end_date)->diffInDays(Carbon::parse($task->start_date)) + 1;
+    }
+
+    return view('tasks.show', compact('task', 'estimate'));
+}
+
 
     public function estimate(Task $task)
     {
@@ -136,10 +194,33 @@ public function update(Request $request, Task $task)
         $task->update($data);
     }
 
-    // Update assign_to (pivot table many-to-many)
+    // // Update assign_to (pivot table many-to-many)
+    // if ($request->has('assign_to')) {
+    //     $task->assignedUsers()->sync($request->assign_to); // replace previous assignments
+    // }
+
     if ($request->has('assign_to')) {
-        $task->assignedUsers()->sync($request->assign_to); // replace previous assignments
+    // Ambil user ID sebelum update
+    $oldUserIds = $task->assignedUsers()->pluck('users.id')->toArray();
+
+    // Sync assignment baru
+    $task->assignedUsers()->sync($request->assign_to);
+
+    // Ambil user baru yang belum pernah di-assign sebelumnya
+    $newAssignedUsers = \App\Models\User::whereIn('id', $request->assign_to)
+        ->whereNotIn('id', $oldUserIds)
+        ->get();
+
+    // Kirim email ke user baru
+    foreach ($newAssignedUsers as $user) {
+        try {
+            Mail::to($user->email)->queue(new TaskAssignedMail($task));
+             Log::info("Email dikirim ke: {$user->email}");
+        } catch (\Exception $e) {
+            \Log::error("Gagal kirim email ke {$user->email}: " . $e->getMessage());
+        }
     }
+}
 
     // Handle file attachment
     if ($request->hasFile('attachment')) {

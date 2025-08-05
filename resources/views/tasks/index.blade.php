@@ -2,7 +2,14 @@
 
 @section('content')
 <div class="container-fluid">
-    <h1 class="mb-4">Daftar Tasks</h1>
+  <h1 class="mb-4">
+  @if(request()->is('my-assigned-tasks'))
+    My Tasks
+  @else
+    Daftar Tasks
+  @endif
+</h1>
+
 
     <!-- Card: Filter & Search -->
     <div class="card mb-4">

@@ -25,21 +25,17 @@ class ProjectController extends Controller
 public function index()
 {
     if (Auth::user()->role == 'admin') {
-        // ✅ Data untuk admin
+        //  Data untuk admin
         $totalProjects = Project::count();
         $totalTasks = Task::count();
         $totalUsers = \App\Models\User::count();
-
         $activeUsersToday = \App\Models\User::whereDate('last_login', Carbon::today())->count();
-
         $tasksPerProject = Project::withCount('tasks')->get();
 
-        // ✅ Hitung task per status (ADMIN: semua project)
         $todoTasks = Task::where('status', 'todo')->count();
         $inprogressTasks = Task::where('status', 'inprogress')->count();
         $doneTasks = Task::where('status', 'done')->count();
 
-        // 📊 Hitung jumlah task per bulan untuk setiap status
         $months = collect(range(1, 12))->map(function ($month) {
             return Carbon::create()->month($month)->format('M');
         });
@@ -62,7 +58,6 @@ public function index()
                 ->count();
         }
 
-        // ✅ Task summary untuk admin
         $taskStats = [
             'completed'   => $doneTasks,
             'in_progress' => $inprogressTasks,
@@ -85,11 +80,12 @@ public function index()
             'taskStats'
         ));
     } else {
-        // ✅ Data untuk user
-        $projects_sidebar = Auth::user()->projects; // ambil project yang user punya akses
-        $projectIds = $projects_sidebar->pluck('id'); // ambil semua ID project user
+        //  Data untuk user biasa
+        $user = Auth::user();
+        $projects_sidebar = $user->projects;
+        $projectIds = $projects_sidebar->pluck('id');
+        $userId = $user->id;
 
-        // ✅ Hitung task di semua project user
         $todoTasks = Task::whereIn('project_id', $projectIds)
             ->where('status', 'todo')
             ->count();
@@ -104,7 +100,6 @@ public function index()
 
         $totalTasks = Task::whereIn('project_id', $projectIds)->count();
 
-        // 📊 Hitung jumlah task per bulan untuk user (hanya task di project yang user akses)
         $months = collect(range(1, 12))->map(function ($month) {
             return Carbon::create()->month($month)->format('M');
         });
@@ -130,6 +125,40 @@ public function index()
                 ->count();
         }
 
+        // Semua assigned tasks untuk dihitung total
+        $totalAssignedTasks = Task::whereHas('assignedUsers', function ($query) use ($userId) {
+            $query->where('user_id', $userId);
+        })
+        ->whereIn('project_id', $projectIds)
+        ->whereIn('status', ['todo', 'inprogress', 'done'])
+        ->count(); // hanya menghitung, tidak ambil data
+
+ $assignedTasks = Task::whereHas('assignedUsers', function ($query) use ($userId) {
+        $query->where('user_id', $userId);
+    })
+    ->whereIn('project_id', $projectIds)
+    ->whereIn('status', ['todo', 'inprogress'])
+    ->with(['assignedUsers' => function ($q) use ($userId) {
+        $q->where('user_id', $userId)
+          ->withPivot('is_read'); // ← INI WAJIB
+    }])
+    ->latest()
+    ->get()
+    ->sortBy(function ($task) use ($userId) {
+        $assignedUser = $task->assignedUsers->first();
+        return $assignedUser?->pivot->is_read ? 1 : 0;
+    });
+
+
+$unreadTaskCount = Task::whereHas('assignedUsers', function ($query) use ($userId) {
+        $query->where('task_user.user_id', $userId)
+              ->where('task_user.is_read', false); // langsung akses kolom di pivot
+    })
+    ->whereIn('project_id', $projectIds)
+    ->count();
+
+
+
         return view('dashboard', compact(
             'projects_sidebar',
             'todoTasks',
@@ -139,7 +168,10 @@ public function index()
             'months',
             'todoTasksPerMonth',
             'inprogressTasksPerMonth',
-            'doneTasksPerMonth'
+            'doneTasksPerMonth',
+            'assignedTasks',
+            'totalAssignedTasks',
+            'unreadTaskCount'
         ));
     }
 }

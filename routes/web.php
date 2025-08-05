@@ -84,6 +84,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/task-rutinan/{id}/edit', [RecurringTaskController::class, 'edit'])->name('admin.task-rutinan.s.edit');
     Route::put('/task-rutinan/{id}', [RecurringTaskController::class, 'update'])->name('admin.task-rutinan.s.update');
     Route::delete('/task-rutinan/{id}', [RecurringTaskController::class, 'destroy'])->name('admin.task-rutinan.destroy');
+    Route::get('/my-assigned-tasks', [TaskController::class, 'myAssignedTasks'])->name('tasks.assigned');
+
 
    Route::get('/theme-settings', [ThemeController::class, 'index'])->name('theme.index');
 
@@ -113,7 +115,6 @@ Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name(
 
 // Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
 //     ->middleware('guest')
-//     ->name('password.email');
 
 
 // web.php
