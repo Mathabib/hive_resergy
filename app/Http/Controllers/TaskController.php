@@ -12,11 +12,64 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log; 
 use App\Mail\TaskAssignedMail;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class TaskController extends Controller
 {
 
+
+    public function print(Task $task)
+{
+    $task->load('assignedUsers', 'comments.user', 'project');
+
+    if ($task->assignedUsers->contains(Auth::id())) {
+        $task->assignedUsers()->updateExistingPivot(Auth::id(), [
+            'is_read' => true
+        ]);
+    }
+
+    $estimate = 0;
+    if ($task->start_date && $task->end_date) {
+        $estimate = Carbon::parse($task->end_date)->diffInDays(Carbon::parse($task->start_date)) + 1;
+    }
+
+    $pdf = Pdf::loadView('tasks.print', compact('task', 'estimate'));
+    return $pdf->download($task->nama_task . '-' . $task->project->nama . '.pdf');
+ 
+}
+
+public function tasksByStatus($status)
+{
+    $user = Auth::user();
+
+    // Validasi status
+    if (!in_array($status, ['todo', 'inprogress', 'done'])) {
+        abort(404);
+    }
+
+    // Tentukan jumlah item per halaman
+    $perPage = 20;
+
+    if ($user->role == 'admin') {
+        $tasks = Task::where('status', $status)
+                     ->latest()
+                     ->paginate($perPage)
+                     ->appends(request()->query()); // menjaga query string saat pagination
+    } else {
+        $projectIds = $user->projects->pluck('id');
+        $tasks = Task::whereIn('project_id', $projectIds)
+                     ->where('status', $status)
+                     ->latest()
+                     ->paginate($perPage)
+                     ->appends(request()->query()); // menjaga query string saat pagination
+    }
+
+    return view('tasks.by_status', compact('tasks', 'status'));
+}
+
+
+    
 public function myAssignedTasks()
 {
     $user = Auth::user();

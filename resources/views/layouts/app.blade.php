@@ -4,6 +4,13 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>HIVE ISOLUTIONS</title>
+
+    <!-- For favicon -->
+<link rel="icon" type="image/png" href="{{ asset('image/favicon.png') }}">
+
+
+
+
     <!--begin::Accessibility Meta Tags-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
     <meta name="color-scheme" content="light dark" />
@@ -25,6 +32,12 @@
     <!--begin::Accessibility Features-->
     <!-- Skip links will be dynamically added by accessibility.js -->
     <meta name="supported-color-schemes" content="light dark" />
+    {{-- Select2 CSS --}}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+{{-- Optional: Select2 Bootstrap Theme --}}
+<link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
+
     <link rel="preload" href="./css/adminlte.css" as="style" />
     <!--end::Accessibility Features-->
     <!--begin::Fonts-->
@@ -79,25 +92,40 @@
   <!-- <body class="layout-fixed sidebar-expand-lg sidebar-open {{ $themeSetting->sidebar_color ?? 'bg-body-tertiary' }}"> -->
   
   <!--begin::App Wrapper-->
-    <div class="app-wrapper">
-      @include('komponen.navbar')
-        @include('komponen.sidebar')
-        <section>
-          <div>
-            @yield('content')
+<div class="app-wrapper d-flex flex-column min-vh-100">
 
+    <!-- Navbar -->
+    @include('komponen.navbar')
+
+    <div class="d-flex flex-grow-1">
+
+      <!-- Sidebar -->
+      @include('komponen.sidebar')
+
+      <!-- Content -->
+      <main class="app-main flex-grow-1">
+        <section class="content py-3 px-2">
+          <div class="container-fluid">
+            @yield('content')
+            
               @stack('js')
               @stack('scripts')
-
           </div>
         </section>
+      </main>
+    </div>
 
-        @include('komponen.footer')
+    <!-- Footer -->
+    @include('komponen.footer')
       <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
+    {{-- Select2 JS --}}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script
       src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.11.0/browser/overlayscrollbars.browser.es6.min.js"
       crossorigin="anonymous"

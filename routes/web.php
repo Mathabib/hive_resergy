@@ -11,6 +11,8 @@ use App\Http\Controllers\RecurringTaskController;
 use App\Http\Controllers\ThemeController;
 use Illuminate\Support\Facades\Artisan; 
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Controllers\CrmController;
+use App\Http\Controllers\BroadcastController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -89,17 +91,17 @@ Route::middleware('auth')->group(function () {
 
    Route::get('/theme-settings', [ThemeController::class, 'index'])->name('theme.index');
 
-Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
-Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
-Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
-Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])
-    ->name('attachments.destroy');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::get('/task/delete/{project}/{task}', [TaskController::class, 'delete'])->name('task.delete');
+    Route::post('/tasks/update-status', [TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::delete('/attachments/{attachment}', [TaskController::class, 'destroyAttachment'])
+        ->name('attachments.destroy');
 
 
 // Simpan pengaturan tema (POST / AJAX)
-Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name('theme.update');
+    Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name('theme.update');
 
     Route::post('/task-rutinan/generate-now', function () {
     Artisan::call('tasks:generate-monthly');
@@ -115,6 +117,26 @@ Route::post('/theme-settings/update', [ThemeController::class, 'update'])->name(
 
 // Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
 //     ->middleware('guest')
+
+// CRM ROUTES
+Route::get('/crm', [CrmController::class, 'index'])->name('crm.index');
+Route::get('/crm/create', [CrmController::class, 'create'])->name('crm.create');
+Route::post('/crm/store', [CrmController::class, 'store'])->name('crm.store');
+Route::get('/crm/{id}/edit', [CrmController::class, 'edit'])->name('crm.edit');
+Route::put('/crm/{id}', [CrmController::class, 'update'])->name('crm.update');
+Route::delete('/crm/{id}', [CrmController::class, 'destroy'])->name('crm.destroy');
+
+// Broadcast Email Routes
+Route::get('/broadcastMail', [BroadcastController::class, 'create'])->name('broadcast.create');
+Route::post('/broadcastMail', [BroadcastController::class, 'send'])->name('broadcast.send');
+Route::get('/broadcast', [BroadcastController::class, 'index'])->name('broadcast.index');
+Route::get('broadcast/{broadcast}/edit', [BroadcastController::class, 'edit'])->name('broadcast.edit');
+Route::put('broadcast/{broadcast}', [BroadcastController::class, 'update'])->name('broadcast.update');
+Route::delete('broadcast/{broadcast}', [BroadcastController::class, 'destroy'])->name('broadcast.destroy');
+
+
+Route::get('/tasks/{task}/print', [TaskController::class, 'print'])->name('tasks.print');
+Route::get('/tasks/status/{status}', [TaskController::class, 'tasksByStatus'])->name('tasks.byStatus');
 
 
 // web.php

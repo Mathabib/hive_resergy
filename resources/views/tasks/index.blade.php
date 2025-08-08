@@ -76,9 +76,9 @@
                   <tbody>
     @forelse ($tasks as $task)
     <tr>
-        <td>{{ $loop->iteration }}</td>
+        <td>{{ $tasks->firstItem() + $loop->index }}</td>
         <td>{{ $task->nama_task }}</td>
-        <td>{{ $task->project_id }}</td>
+        <td>{{ $task->project->nama ?? '-'  }}</td>
         <td>
             @if ($task->status == 'todo')
                 <span class="badge bg-secondary">Todo</span>

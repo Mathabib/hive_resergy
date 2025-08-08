@@ -139,12 +139,12 @@
       >
         <path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
-      <a
-        href="#"
-        class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover"
-      >
-        <!-- More info <i class="bi bi-link-45deg"></i> -->
-      </a>
+     <a href="{{ route('tasks.byStatus', ['status' => 'todo']) }}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+    <span class="text-light">
+        View Todo Tasks <i class="bi bi-arrow-right-circle"></i>
+    </span>
+</a>
+
     </div>
   </div>
 
@@ -164,12 +164,11 @@
       >
         <path d="M12 2v20M2 12h20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
-      <a
-        href="#"
-        class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
-      >
-        <!-- More info <i class="bi bi-link-45deg"></i> -->
-      </a>
+      <a href="{{ route('tasks.byStatus', ['status' => 'inprogress']) }}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+    <span class="text-light">
+        View In Progress Tasks <i class="bi bi-arrow-right-circle"></i>
+    </span>
+</a>
     </div>
   </div>
 
@@ -189,12 +188,11 @@
       >
         <path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      <a
-        href="#"
-        class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
-      >
-        <!-- More info <i class="bi bi-link-45deg"></i> -->
-      </a>
+       <a href="{{ route('tasks.byStatus', ['status' => 'done']) }}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+    <span class="text-light">
+        View Completed Tasks <i class="bi bi-arrow-right-circle"></i>
+    </span>
+</a>
     </div>
   </div>
 
@@ -214,12 +212,11 @@
       >
         <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/>
       </svg>
-      <a
-        href="#"
-        class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover"
-      >
-        <!-- More info <i class="bi bi-link-45deg"></i> -->
-      </a>
+      <a href="{{ route('tasks.index') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+              <span class="text-light">
+                View All Tasks <i class="bi bi-arrow-right-circle"></i>
+              </span>
+          </a>
     </div>
   </div>
 </div>

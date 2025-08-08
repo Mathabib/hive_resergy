@@ -103,7 +103,7 @@
                     @if(Auth::user()->role == 'admin')
                         <li class="nav-item">
                             <a href="#" class="nav-link">
-                                <i class="nav-icon bi bi-box-seam-fill"></i>
+                                <i class="nav-icon bi bi-gear-fill"></i>
                                 <p>
                                     Settings
                                     <i class="nav-arrow bi bi-chevron-right"></i>
@@ -140,6 +140,31 @@
                             </li>
 
 
+                            </ul>                            
+                        </li>
+
+                         <li class="nav-item">
+                            <a href="#" class="nav-link">
+                               <i class="nav-icon bi bi-envelope-fill"></i>
+                                <p>
+                                    Email
+                                    <i class="nav-arrow bi bi-chevron-right"></i>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">                            
+                                    <li class="nav-item">
+                                        <a href="{{ route('crm.index') }}" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p>CRM</p>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('broadcast.index') }}" class="nav-link">
+                                            <i class="nav-icon bi bi-circle"></i>
+                                            <p>Broadcast Email</p>
+                                        </a>
+                                    </li>  
+                                </li>
                             </ul>                            
                         </li>
                     @endif

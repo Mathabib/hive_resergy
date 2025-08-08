@@ -46,7 +46,16 @@
       <i class="fa-solid fa-trash me-2"></i> Delete Task
     </a>
   </li>
-</ul>
+
+  <li>
+    <a href="{{ route('tasks.print', $task->id) }}" 
+       class="dropdown-item d-flex align-items-center text-success">
+      <i class="fa fa-print me-2"></i>  Print as PDF
+    </a>
+  </li>
+  
+  <li>
+
 
     </div>
   </div>
@@ -88,22 +97,49 @@
               </select>
             </div>
           </div>          
-          <div role="row" class="d-flex mb-3">
-            <div role="cell" class="me-3 cell-label" >Assign To</div> 
-            <div role="cell" class=" cell-konten">
-              <select multiple class="form-control form-control-sm" name="assign_to[]" id="assign_to_input" style="width:100%; padding:8px; border-radius:6px; border:1px solid #ccc;">
-                @foreach($task->project->users as $user)
-                <option value="{{ $user->id }}" 
-                  @if(in_array($user->id, old('assign_to', $task->assignedUsers->pluck('id')->toArray()))) selected @endif>
-                  {{ $user->name }}
-                </option>
-              @endforeach
-            </select>
-                  <small class="text-muted d-block mt-1" style="font-size: 0.75rem;">
-                  * Hold <strong>Ctrl</strong> (Windows) or <strong>Cmd ⌘</strong> (Mac) to select multiple users.
-                </small>
-            </div>
-          </div>      
+         <div class="mb-3 position-relative" style="max-width: 400px;">
+  <label for="assignDropdown" class="form-label fw-bold">Assignee <span class="text-danger">*</span></label>
+  
+  <!-- Trigger Dropdown -->
+  <div class="form-control d-flex justify-content-between align-items-center" 
+       id="assignDropdownToggle"
+       style="cursor: pointer;">
+    <span id="selectedCount">Select employee</span>
+    <i class="bi bi-chevron-down"></i>
+  </div>
+
+  <!-- Dropdown Panel -->
+  <div id="assignDropdown" class="border rounded mt-1 bg-white shadow-sm position-absolute w-100" style="z-index: 1000; display: none; max-height: 250px; overflow-y: auto;">
+    <!-- Search -->
+    <div class="p-2 border-bottom">
+      <input type="text" class="form-control form-control-sm" id="searchAssignee" placeholder="Search...">
+    </div>
+
+    <!-- Select All -->
+    <div class="form-check mx-2 mt-2">
+      <input class="form-check-input" type="checkbox" id="selectAll">
+      <label class="form-check-label" for="selectAll">Select All</label>
+    </div>
+
+    <!-- List Users -->
+    <div id="assignList" class="p-2">
+      @foreach($task->project->users as $user)
+      <div class="form-check">
+        <input class="form-check-input user-checkbox" 
+               type="checkbox" 
+               name="assign_to[]" 
+               value="{{ $user->id }}" 
+               id="user_{{ $user->id }}"
+               @if(in_array($user->id, old('assign_to', $task->assignedUsers->pluck('id')->toArray()))) checked @endif>
+        <label class="form-check-label" for="user_{{ $user->id }}">
+          {{ $user->name }}
+        </label>
+      </div>
+      @endforeach
+    </div>
+  </div>
+</div>
+
         </div>
 
         <div role="table">
@@ -557,6 +593,57 @@ $('#start_date_input, #end_date_input').on('change', updateEstimate);
 updateEstimate();
 
 </script>
+
+
+
+<script>
+  const dropdownToggle = document.getElementById('assignDropdownToggle');
+  const dropdown = document.getElementById('assignDropdown');
+  const checkboxes = document.querySelectorAll('.user-checkbox');
+  const selectAll = document.getElementById('selectAll');
+  const searchInput = document.getElementById('searchAssignee');
+  const selectedCount = document.getElementById('selectedCount');
+
+  // Toggle dropdown
+  dropdownToggle.addEventListener('click', () => {
+    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Click outside to close
+  document.addEventListener('click', function (e) {
+    if (!dropdown.contains(e.target) && !dropdownToggle.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+  // Update selected count
+  function updateSelectedCount() {
+    const selected = document.querySelectorAll('.user-checkbox:checked');
+    if (selected.length === 0) {
+      selectedCount.innerText = 'Select employee';
+    } else {
+      selectedCount.innerText = `${selected.length} selected`;
+    }
+  }
+  checkboxes.forEach(cb => cb.addEventListener('change', updateSelectedCount));
+  updateSelectedCount();
+
+  // Select All functionality
+  selectAll.addEventListener('change', function () {
+    checkboxes.forEach(cb => cb.checked = this.checked);
+    updateSelectedCount();
+  });
+
+  // Live search
+  searchInput.addEventListener('input', function () {
+    const term = this.value.toLowerCase();
+    checkboxes.forEach(cb => {
+      const label = cb.nextElementSibling.innerText.toLowerCase();
+      cb.closest('.form-check').style.display = label.includes(term) ? '' : 'none';
+    });
+  });
+</script>
+
 
 
 
