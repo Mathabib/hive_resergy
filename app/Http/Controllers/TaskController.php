@@ -222,7 +222,8 @@ public function update(Request $request, Task $task)
         'assign_to.*'  => 'exists:users,id',
         'priority'     => 'nullable|in:low,medium,high',
         'description'  => 'nullable|string',
-        'attachment.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx|max:2048',
+      'attachment.*' => 'file|mimes:jpg,jpeg,png,pdf,doc,docx,xls,xlsx|max:2048',
+
     ]);
 
     $data = [];

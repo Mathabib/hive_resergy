@@ -145,4 +145,9 @@ Route::post('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.upd
 Route::middleware('auth')->post('/tasks/{task}/comments', [CommentController::class, 'store']);
 });
 
+
+// Halaman form CRM publik tanpa login
+Route::get('/form-crm', [CRMController::class, 'formCrm'])->name('crm.formCrm');
+Route::post('/form-crm', [CRMController::class, 'sumbitForm'])->name('crm.sumbitForm');
+
 require __DIR__.'/auth.php';
