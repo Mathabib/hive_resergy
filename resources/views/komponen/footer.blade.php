@@ -1,7 +1,7 @@
-<!-- <footer class="app-footer"> -->
+<footer class="app-footer">
 
-<footer class="app-footer {{ $themeSetting->footer_color ?? 'bg-body-tertiary' }}"
-    data-bs-theme="{{ $themeSetting->footer_theme ?? 'light' }}">
+{{-- <footer class="app-footer {{ $themeSetting->footer_color ?? 'bg-body-tertiary' }}"
+    data-bs-theme="{{ $themeSetting->footer_theme ?? 'light' }}"> --}}
 
         <!--begin::To the end-->
         <div class="float-end d-none d-sm-inline">Anything you want</div>

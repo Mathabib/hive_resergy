@@ -202,7 +202,7 @@
 </div>
 
 <!-- search bar -->
-<div class="search-bar-container">
+<div class="search-bar-container" data-bs-theme="light">
   <div class="input-group search-bar">
     <span class="input-group-text"><i class="bi bi-search"></i></span>
     <input type="text" id="task-search" class="form-control" placeholder="Search tasks...">
@@ -229,7 +229,7 @@
       </h2>
 
 @foreach ($tasks->where('status', $status) as $task)
-  <div class="kanban-card" draggable="true" data-id="{{ $task->id }}" onclick="goToTaskDetail({{ $task->id }})">
+  <div class="kanban-card" draggable="true" data-id="{{ $task->id }}" onclick="goToTaskDetail({{ $task->id }})" >
     <span>{{ $task->nama_task }}</span>
     <span class="kanban-card-icons">
     </span>
@@ -445,3 +445,4 @@ document.getElementById('task-search').addEventListener('input', function () {
 
 </script>
 @endpush
+

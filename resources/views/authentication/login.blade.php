@@ -14,7 +14,7 @@
   height: 100%;
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background: url("{{ asset('assets/image/1.png') }}") no-repeat center center fixed;
+  background: url("{{ asset('assets/image/resindo_background.png') }}") no-repeat center center fixed;
   background-size: cover;
 }
 
@@ -29,7 +29,7 @@
 
 /* HAPUS backdrop-filter di form-box */
 .form-box {
-  background-color: rgba(255, 255, 255, 0.74); /* transparan */
+  background-color: rgba(46, 46, 46, 0.74); /* transparan */
   /* backdrop-filter: blur(15px); */ /* HAPUS ini! */
   padding: 3rem;
   border-radius: 20px;
@@ -88,11 +88,13 @@
     }
 
     .form-floating > label {
-      color: #800000;
+      /* color: #800000; */
+      color: #ffc200;
     }
 
     .form-check-label {
-      color: #800000;
+      /* color: #800000; */
+      color: #ffc200;
     }
 
     .form-control::placeholder {
@@ -107,20 +109,25 @@
     }
 
     .btn-primary {
-      background-color: #fff;
-      color: #b30000;
+      /* background-color: #fff;
+      color: #b30000; */
+      background-color: #0d0d0d;
+      color: #ffc200;
       font-weight: bold;
       border: none;
       border-radius: 10px;
     }
 
     .btn-primary:hover {
-      background-color: #f1f1f1;
-      color: #a00000;
+      /* background-color: #f1f1f1;
+      color: #a00000; */
+      background-color: #ffc200;
+      color: #0d0d0d;
     }
 
     a {
-      color: #800000;
+      /* color: #800000; */
+      color: #ffc200;
       text-decoration: underline;
     }
 
@@ -143,7 +150,7 @@
       @csrf
 
       <!-- Logo -->
-      <img src="{{ asset('assets/image/logo-isol.png') }}" alt="Isol Logo" class="logo">
+      <img src="{{ asset('assets/image/resindo-logo.jpg') }}" alt="Isol Logo" class="logo">
 
       <!-- <h2>Login</h2> -->
 

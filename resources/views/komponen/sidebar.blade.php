@@ -1,16 +1,16 @@
   <!--begin::Sidebar-->
-      <!-- <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> -->
-      <aside class="app-sidebar {{ $themeSetting->sidebar_color ?? 'bg-body-tertiary' }}"
-    data-bs-theme="{{ $themeSetting->sidebar_theme ?? 'light' }}">
+      <aside class="app-sidebar bg-body-secondary shadow">
+      {{-- <aside class="app-sidebar {{ $themeSetting->sidebar_color ?? 'bg-body-tertiary' }}"
+    data-bs-theme="{{ $themeSetting->sidebar_theme ?? 'light' }}"> --}}
   
       <!--begin::Sidebar Brand-->
-        <div class="sidebar-brand">
+        <div class="d-flex justify-content-center p-2">
           <!--begin::Brand Link-->
           <a href="{{ route('dashboard') }}" class="brand-link">
             <!--begin::Brand Image-->
              <!--begin::Left Logo-->
                <img
-                src="{{ asset('assets/image/logo-isol.png') }}"
+                src="{{ asset('assets/image/resindo-logo.jpg') }}"
                 alt="Isolutions Logo"
                 style="width: 140px; height: auto;"
                 class="brand-image opacity-75 shadow"

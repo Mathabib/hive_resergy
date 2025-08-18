@@ -1,6 +1,6 @@
-<!-- <nav class="app-header navbar navbar-expand bg-body"> -->
-    <nav class="app-header navbar navbar-expand {{ $themeSetting->navbar_color ?? 'bg-primary' }}"
-    data-bs-theme="{{ $themeSetting->navbar_theme ?? 'light' }}">
+<nav class="app-header navbar navbar-expand bg-body">
+    {{-- <nav class="app-header navbar navbar-expand {{ $themeSetting->navbar_color ?? 'bg-primary' }}"
+    data-bs-theme="{{ $themeSetting->navbar_theme ?? 'light' }}"> --}}
 
         <div class="container-fluid">
           <ul class="navbar-nav">
