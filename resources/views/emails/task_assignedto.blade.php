@@ -51,7 +51,7 @@
               <!-- Footer -->
               <p style="font-size:16px; color:#555555; margin:30px 0 0 0;">Thank you for being part of our team 💼.</p>
               <p style="font-size:13px; color:#999999; text-align:center; margin-top:40px;">
-                &copy; {{ date('Y') }} Hive isolutions. All rights reserved.<br>
+                &copy; {{ date('Y') }} Hive Resindo. All rights reserved.<br>
               </p>
 
             </td>
