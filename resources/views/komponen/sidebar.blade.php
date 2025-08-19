@@ -72,7 +72,7 @@
           <!-- Bagi jadi dua: satu untuk link, satu untuk toggle -->
           <div class="d-flex justify-content-between align-items-center">
             <a href="{{ route('projects.show', $project->id) }}"
-               class="nav-link flex-grow-1 {{ request()->is('projects/'.$project->id) ? 'active' : '' }}">
+               class="nav-link flex-grow-1 text-truncate {{ request()->is('projects/'.$project->id) ? 'active' : '' }}">
               <i class="nav-icon bi bi-folder"></i>
               <p class="mb-0">{{ $project->nama }}</p>
             </a>
