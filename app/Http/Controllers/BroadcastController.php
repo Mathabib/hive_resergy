@@ -60,9 +60,14 @@ class BroadcastController extends Controller
 
         try {
             foreach ($request->recipients as $email) {
-                Mail::mailer('marketing')
-                    ->to($email)
-                    ->queue(new BroadcastMail(
+                // Mail::mailer('marketing')
+                //     ->to($email)
+                //     ->queue(new BroadcastMail(
+                //         $request->subject,
+                //         $request->message,
+                //         $attachmentPath ? storage_path('app/public/' . $attachmentPath) : null
+                //     ));
+                Mail::to($email)->queue(new BroadcastMail(
                         $request->subject,
                         $request->message,
                         $attachmentPath ? storage_path('app/public/' . $attachmentPath) : null

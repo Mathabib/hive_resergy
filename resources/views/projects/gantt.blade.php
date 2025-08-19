@@ -9,7 +9,7 @@
     }
 </style>
 <div class="container py-4">
-    <div class="card shadow-sm border-0 bg-white text-danger" id="gantt_data" data-urlupdate="{{ route('gantt.update') }}" data-csrftoken="{{ csrf_token() }}">
+    <div class="card shadow-sm border-0 bg-white text-black" id="gantt_data" data-urlupdate="{{ route('gantt.update') }}" data-csrftoken="{{ csrf_token() }}">
         <div class="card-body">
             <h3 class="mb-4">📊 Project Gantt Chart: <strong>{{ $project->nama }}</strong></h3>
 

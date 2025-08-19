@@ -56,7 +56,7 @@
               </a>
               <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
                 <!--begin::User Image-->
-                <li class="user-header text-bg-danger">
+                <li class="user-header text-bg-warning">
                   <img
                      src="{{ $authuser && $authuser->profile_photo ? asset('storage/profile_photos/' . $authuser->profile_photo) : asset('assets/img/default-avatar.png') }}"
                     class="rounded-circle shadow"
@@ -77,9 +77,9 @@
                 <!--end::Menu Body-->
                 <!--begin::Menu Footer-->
                 <li class="user-footer">
-               <a href="{{ route('profile.edit') }}" class="btn btn-default btn-flat">Profile</a>
+               <a href="{{ route('profile.edit') }}" class="btn btn-default btn-flat bg-warning">Profile</a>
 
-                    <a href="#" class="btn btn-default btn-flat float-end"
+                    <a href="#" class="btn btn-default btn-flat bg-warning float-end"
                     onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                         Sign out
                     </a>

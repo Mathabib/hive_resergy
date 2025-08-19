@@ -5,7 +5,7 @@
     /* Full height container dengan background netral */
     .fullpage-container {
         min-height: 100vh;
-        background-color: #f9fafb; /* abu sangat terang / hampir putih */
+        background-color: #f9fafb00; /* abu sangat terang / hampir putih */
         color: #333;
         padding: 2rem;
         display: flex;
@@ -26,14 +26,15 @@
     .page-header h2 {
         font-weight: 700;
         font-size: 2rem;
-        color: #b91c1c; /* merah gelap */
+        color: #ffc107; /* merah gelap */
     }
 
     .btn-create {
-        background-color: #b91c1c;
+        background-color: #ffc107;
         border: none;
-        color: white;
+        color: rgb(0, 0, 0);
         font-weight: 600;
+        text-decoration: none;
         padding: 0.5rem 1.2rem;
         border-radius: 0.5rem;
         transition: background-color 0.3s ease;
@@ -43,8 +44,10 @@
     }
 
     .btn-create:hover {
-        background-color: #7f1d1d;
-        box-shadow: 0 0 8px rgba(185, 28, 28, 0.7);
+        /* background-color: #7f1d1d; */
+        background-color: #272727;
+        color: white;
+        box-shadow: 0 0 8px  #fcf5e0;
     }
 
     /* Statistik cards */
@@ -62,7 +65,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        color: #b91c1c;
+        color: #ffc107;
         font-weight: 600;
         transition: transform 0.3s ease;
     }
@@ -107,7 +110,8 @@
     }
 
     thead th {
-        background-color: #f87171; /* merah muda */
+        /* background-color: #f87171; */
+        background-color: #ffd862;
         font-weight: 700;
         padding: 0.75rem 1rem;
         border-radius: 1rem 1rem 0 0;
@@ -116,14 +120,16 @@
     }
 
     tbody tr {
-        background: #fff5f5; /* merah sangat lembut */
+        /* background: #fff5f5; merah sangat lembut */
+        background-color: #fcf5e0;
         border-radius: 1rem;
         transition: background-color 0.3s ease;
         cursor: default;
     }
 
     tbody tr:hover {
-        background: #fca5a5; /* merah muda sedang */
+        /* background: #fca5a5; merah muda sedang */
+        background: #ffeaaa;
     }
 
     tbody td {

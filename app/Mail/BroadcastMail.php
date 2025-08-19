@@ -23,15 +23,21 @@ class BroadcastMail extends Mailable
 
     public function build()
     {
-        $email = $this->from(
-                env('MAIL_FROM_ADDRESS_MARKETING'),
-                env('MAIL_FROM_NAME_MARKETING')
-            )
+        $email = $this
             ->subject($this->subjectText)
             ->view('emails.broadcast')
             ->with([
                 'messageText' => $this->messageText
             ]);
+        // $email = $this->from(
+        //         env('MAIL_FROM_ADDRESS_MARKETING'),
+        //         env('MAIL_FROM_NAME_MARKETING')
+        //     )
+        //     ->subject($this->subjectText)
+        //     ->view('emails.broadcast')
+        //     ->with([
+        //         'messageText' => $this->messageText
+        //     ]);
 
         if ($this->attachmentPath) {
             $email->attach($this->attachmentPath);

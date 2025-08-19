@@ -3,14 +3,15 @@
 @section('content')
 <style>
     main.app-main {
-        background-color: #f9fafb;
+        background-color: #f9fafb00;
         min-height: 100vh;
         padding: 2rem;
         color: #333;
     }
 
     h3 {
-        color: #b91c1c;
+        color: #ffc107;
+        /* color: #b91c1c; */
         font-weight: 700;
         margin-bottom: 1.5rem;
     }
@@ -75,9 +76,9 @@
 
     /* Button */
     button[type="submit"] {
-        background-color: #b91c1c;
+        background-color: #ffc107;
         border: none;
-        color: white;
+        color: black;
         font-weight: 700;
         padding: 0.65rem 1.5rem;
         border-radius: 0.5rem;
@@ -88,7 +89,9 @@
     }
 
     button[type="submit"]:hover {
-        background-color: #7f1d1d;
+        background-color: black;
+        color: white;
+        /* background-color: #7f1d1d; */
         box-shadow: 0 0 12px rgba(185, 28, 28, 0.6);
     }
 
@@ -101,7 +104,7 @@
             @csrf
 
             <!-- Subject -->
-            <div class="form-group mb-3">
+            <div class="form-group mb-3" data-bs-theme="light">
                 <label for="subject">Subject</label>
                 <input id="subject" type="text" name="subject" class="form-control" required>
             </div>
@@ -114,7 +117,7 @@
             </div>
 
             <!-- Attachment -->
-            <div class="form-group mb-3">
+            <div class="form-group mb-3" data-bs-theme="light">
                 <label for="attachment">Attachment (optional)</label>
                 <input id="attachment" type="file" name="attachment" class="form-control">
             </div>
@@ -129,7 +132,7 @@
                 </div>
 
                 <!-- Dropdown -->
-                <div id="assignDropdown" class="border rounded mt-1 bg-white shadow-sm w-99" style="display: none; position: absolute;">
+                <div id="assignDropdown" class="border rounded mt-1 bg-white shadow-sm w-99" style="display: none; position: absolute;" data-bs-theme="light">
                     
                     <!-- Search -->
                     <div class="p-2 border-bottom">
