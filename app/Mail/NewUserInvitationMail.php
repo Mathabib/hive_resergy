@@ -24,7 +24,7 @@ class NewUserInvitationMail extends Mailable implements ShouldQueue
 
     public function build()
     {
-        return $this->subject('Welcome to ISolutions Indonesia')
+        return $this->subject('Welcome to Resindo Indonesia')
                     ->view('emails.new_user_invitation');
     }
 }

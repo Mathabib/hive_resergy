@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" >
+<html lang="en" data-bs-theme="dark">
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

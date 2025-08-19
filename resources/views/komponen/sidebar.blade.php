@@ -1,5 +1,15 @@
   <!--begin::Sidebar-->
-      <aside class="app-sidebar bg-body-secondary shadow">
+      <aside class="app-sidebar bg-warning shadow">
+
+        {{-- styling tambahan untuk merubah warna text sidebar menu --}}
+        <style>
+          .sidebar-wrapper .nav-link,
+          .sidebar-wrapper .nav-link p,
+          .sidebar-wrapper .nav-link i {
+            color: #000 !important;
+          }
+        </style>
+        
       {{-- <aside class="app-sidebar {{ $themeSetting->sidebar_color ?? 'bg-body-tertiary' }}"
     data-bs-theme="{{ $themeSetting->sidebar_theme ?? 'light' }}"> --}}
   
@@ -24,7 +34,7 @@
         </div>
         <!--end::Sidebar Brand-->
         <!--begin::Sidebar Wrapper-->
-        <div class="sidebar-wrapper">
+        <div class="sidebar-wrapper text-dark">
             <nav class="mt-2">
                 <!--begin::Sidebar Menu-->
                 <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">

@@ -1,4 +1,4 @@
-<footer class="app-footer">
+<footer class="app-footer bg-warning">
 
 {{-- <footer class="app-footer {{ $themeSetting->footer_color ?? 'bg-body-tertiary' }}"
     data-bs-theme="{{ $themeSetting->footer_theme ?? 'light' }}"> --}}

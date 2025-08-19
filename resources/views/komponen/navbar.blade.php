@@ -1,4 +1,20 @@
-<nav class="app-header navbar navbar-expand bg-body">
+
+<style>
+ /* Navbar text & icon jadi hitam */
+.app-header.navbar.bg-warning .nav-link,
+.app-header.navbar.bg-warning .nav-link i,
+.app-header.navbar.bg-warning .user-menu > a,
+.app-header.navbar.bg-warning .dropdown-menu a {
+  color: #000 !important;
+}
+
+/* Hover effect opsional */
+.app-header.navbar.bg-warning .nav-link:hover,
+.app-header.navbar.bg-warning .dropdown-menu a:hover {
+  color: #333 !important;
+}
+</style>
+<nav class="app-header navbar navbar-expand bg-warning">
     {{-- <nav class="app-header navbar navbar-expand {{ $themeSetting->navbar_color ?? 'bg-primary' }}"
     data-bs-theme="{{ $themeSetting->navbar_theme ?? 'light' }}"> --}}
 

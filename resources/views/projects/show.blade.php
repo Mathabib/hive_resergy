@@ -213,12 +213,12 @@
 
 
 <div style="padding: 20px 20px 0 20px;" id="project-title" data-projectid="{{ $project->id }}">
-  <h1 style="font-size: 1.75rem; font-weight: 700; color: #db4747ff;">
+  <h1 style="font-size: 1.75rem; font-weight: 700;" class="text-warning">
     {{ $project->nama ?? 'Unnamed Project' }}
   </h1>
 </div>
 
-<div class="kanban-board">
+<div class="kanban-board" style="color: black">
   @foreach (['todo' => 'To Do', 'inprogress' => 'In Progress', 'done' => 'Complete'] as $status => $title)
     <div class="kanban-column" id="{{ $status }}">
       <h2 class="column-header">
