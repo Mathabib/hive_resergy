@@ -45,6 +45,7 @@
       position: relative;
       z-index: 1;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100%;
@@ -158,7 +159,7 @@
       <div class="mb-3">
         <div class="input-group">
           <div class="form-floating flex-grow-1">
-            <input id="loginEmail" name="email" type="email" class="form-control" placeholder="Email" required />
+            <input id="loginEmail" name="email" type="email" class="form-control" placeholder="Email" required style="color: white" />
             <label for="loginEmail">Email</label>
           </div>
           <span class="input-group-text"><i class="bi bi-envelope"></i></span>
@@ -169,7 +170,7 @@
       <div class="mb-3">
         <div class="input-group">
           <div class="form-floating flex-grow-1">
-            <input id="loginPassword" name="password" type="password" class="form-control" placeholder="Password" required />
+            <input id="loginPassword" name="password" type="password" class="form-control" placeholder="Password" required style="color: white" />
             <label for="loginPassword">Password</label>
           </div>
           <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
@@ -194,6 +195,11 @@
         <a href="{{ route('password.request') }}">I forgot my password</a>
       </p>
     </form>
+
+   <div style="position: fixed; bottom: 10px; width: 100%; text-align: center;">
+    <h5 style="color: white; margin: 0;">Created By Isolutions</h5>
   </div>
+  </div>
+  
 </body>
 </html>
