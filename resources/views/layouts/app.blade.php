@@ -3,7 +3,7 @@
   <!--begin::Head-->
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>HIVE ISOLUTIONS</title>
+    <title>HIVE RESINDO</title>
 
     <!-- For favicon -->
 <link rel="icon" type="image/png" href="{{ asset('image/favicon.png') }}">
